@@ -1,0 +1,523 @@
+:root {
+  --bg-color: #000000;
+  --card-bg: #1a1a1a;
+  --text-color: #ffffff;
+  --accent-color: #FF9933;
+  --highlight-color: #ffb060;
+  --secondary-color: #05d9e8;
+  /* For blue team / away? or just contrast */
+  --font-main: 'Oxygen', sans-serif;
+  --font-alt: 'Outfit', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+}
+
+#app {
+  width: 100%;
+  max-width: 900px;
+  padding: 15px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  margin-bottom: 20px;
+  border-bottom: 2px solid #333;
+  padding-bottom: 20px;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+h1 {
+  font-family: var(--font-main);
+  font-weight: 700;
+  font-size: 2rem;
+  margin: 0;
+  color: var(--accent-color);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 0 15px rgba(255, 153, 51, 0.2);
+  flex-grow: 1;
+  text-align: left;
+}
+
+/* Toggle Switch */
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle-label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #555;
+  transition: color 0.3s;
+}
+
+.toggle-label.active {
+  color: var(--text-color);
+  text-shadow: 0 0 5px white;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #333;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked+.slider {
+  background-color: var(--accent-color);
+}
+
+input:checked+.slider:before {
+  transform: translateX(24px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+h2 {
+  font-family: var(--font-main);
+  font-weight: 400;
+  font-size: 1.1rem;
+  color: #aaa;
+  margin-top: 5px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  text-align: left;
+}
+
+/* Progress Bar */
+.progress-section {
+  margin-top: 25px;
+  background: #111;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+
+.progress-steps {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.progress-steps::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #333;
+  z-index: 0;
+  transform: translateY(-50%);
+}
+
+.step {
+  position: relative;
+  z-index: 1;
+  background: #111;
+  padding: 5px 10px;
+  border: 2px solid #444;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #666;
+  text-transform: uppercase;
+  transition: all 0.3s;
+}
+
+/* Home Team (Orange) */
+.step[data-team="home"].active {
+  border-color: var(--accent-color);
+  color: var(--text-color);
+  background: #221a10;
+  box-shadow: 0 0 15px rgba(255, 153, 51, 0.4);
+  transform: scale(1.1);
+}
+
+.step[data-team="home"].completed {
+  border-color: var(--accent-color);
+  background: var(--accent-color);
+  color: #000;
+}
+
+/* Away Team (Blue) */
+.step[data-team="away"].active {
+  border-color: var(--secondary-color);
+  color: var(--text-color);
+  background: #101a22;
+  /* Dark blue tinted bg */
+  box-shadow: 0 0 15px rgba(5, 217, 232, 0.4);
+  transform: scale(1.1);
+}
+
+.step[data-team="away"].completed {
+  border-color: var(--secondary-color);
+  background: var(--secondary-color);
+  color: #000;
+}
+
+/* Neutral/Pick (Green) */
+.step[data-team="neutral"].active {
+  border-color: #00ff00;
+  color: #fff;
+  background: #112211;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+  transform: scale(1.1);
+}
+
+.step[data-team="neutral"].completed {
+  border-color: #00ff00;
+  background: #00ff00;
+  color: #000;
+}
+
+.turn-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+  min-height: 32px;
+  /* Prevent layout jump */
+}
+
+.turn-indicator {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.mini-reset-btn {
+  background: transparent;
+  border: 1px solid #444;
+  color: #888;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.mini-reset-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.mini-reset-btn:hover {
+  color: var(--text-color);
+  border-color: var(--text-color);
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(180deg);
+}
+
+.text-home {
+  color: var(--accent-color);
+}
+
+.text-away {
+  color: var(--secondary-color);
+}
+
+.text-neutral {
+  color: #00ff00;
+}
+
+h3 {
+  font-size: 1rem;
+  color: var(--accent-color);
+  margin-bottom: 15px;
+  margin-top: 0;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 700;
+  display: inline-block;
+  border-bottom: 1px solid #333;
+  padding-bottom: 5px;
+}
+
+.stage-section {
+  margin-bottom: 25px;
+}
+
+.stage-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+}
+
+.stage-card {
+  background: var(--card-bg);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  flex: 0 1 240px;
+  aspect-ratio: 16/9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #333;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+.stage-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 15px rgba(255, 153, 51, 0.15);
+  border-color: var(--accent-color);
+}
+
+.stage-card.disabled {
+  cursor: default;
+  /* Removed visual dimming as requested */
+}
+
+.stage-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: filter 0.3s;
+}
+
+.stage-name {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  font-weight: 700;
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 1);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+  padding: 15px 5px 8px;
+  font-size: 0.9rem;
+  pointer-events: none;
+  text-align: center;
+}
+
+/* Strike Overlay */
+.stage-card.banned {
+  border-color: #333;
+}
+
+/* Basic Banned (Grayscale + X) */
+.stage-card.banned .stage-img {
+  filter: grayscale(1);
+  opacity: 0.3;
+}
+
+.stage-card.banned::before {
+  content: 'X';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 8rem;
+  /* Bold and large */
+  line-height: 1;
+  z-index: 2;
+  font-weight: 900;
+  /* Extra bold */
+  font-family: sans-serif;
+  text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+  opacity: 1;
+  color: red;
+  /* Fallback */
+}
+
+/* Clear the 'after' pseudo element if it exists from previous CSS */
+.stage-card.banned::after {
+  content: none;
+}
+
+/* Team Specific Ban Colors */
+/* Home = Orange */
+.stage-card.banned-home::before {
+  color: var(--accent-color);
+}
+
+/* Away = Blue */
+.stage-card.banned-away::before {
+  color: var(--secondary-color);
+}
+
+/* Auto/Neutral = Red */
+.stage-card.banned-auto::before {
+  color: #ff4444;
+}
+
+/* Picked Stage (Winner) */
+.stage-card.picked {
+  border-color: #00ff00;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+}
+
+.stage-card.picked::before {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 5rem;
+  color: #00ff00;
+  z-index: 10;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+
+.controls {
+  margin: 30px 0 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.btn {
+  background: transparent;
+  border: 1px solid #444;
+  color: #ccc;
+  padding: 12px 25px;
+  font-family: var(--font-main);
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  min-width: 200px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn:hover {
+  border-color: var(--accent-color);
+  color: var(--bg-color);
+  background: var(--accent-color);
+}
+
+.reset-btn {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  border-width: 1px;
+}
+
+.reset-btn:hover {
+  background: var(--accent-color);
+  color: #000;
+}
+
+.external-links {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+@media (max-width: 600px) {
+  .header-top {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.6rem;
+  }
+
+  h2 {
+    text-align: center;
+    font-size: 0.9rem;
+  }
+
+  .stage-grid {
+    gap: 10px;
+  }
+
+  .stage-card {
+    flex: 0 1 calc(50% - 10px);
+    min-width: 140px;
+  }
+
+  .step {
+    font-size: 0.6rem;
+    padding: 3px 6px;
+  }
+
+  .turn-indicator {
+    font-size: 1rem;
+  }
+}
