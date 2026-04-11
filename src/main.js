@@ -33,14 +33,34 @@ let currentState = {
   game: 1
 };
 
+function updateFlowGuide() {
+  const steps = document.getElementById('subsequent-steps');
+  if (currentState.mode === 'solos') {
+    steps.innerHTML = `
+      <li><span class="flow-team winner">WINNER</span> announces character(s) first</li>
+      <li><span class="flow-team loser">LOSER</span> announces character(s)</li>
+      <li><span class="flow-team winner">WINNER</span> strikes 2 stages from full list</li>
+      <li><span class="flow-team loser">LOSER</span> picks next stage (no DSR stage)</li>
+    `;
+  } else {
+    steps.innerHTML = `
+      <li><span class="flow-team winner">WINNING TEAM</span> declares player &amp; character first</li>
+      <li><span class="flow-team loser">LOSING TEAM</span> declares player &amp; character</li>
+      <li><span class="flow-team winner">WINNER</span> bans 3 stages from the pool</li>
+      <li><span class="flow-team loser">LOSER</span> picks stage from remaining</li>
+    `;
+  }
+}
+
 function resetBoard() {
   currentState.step = 0;
   currentState.bannedStages = [];
   updateProgressHTML();
-  renderStages(); // Re-render in case mode changed
+  renderStages();
   updateUI();
   updateRulesText();
   updateExternalLinks();
+  updateFlowGuide();
 }
 
 function updateExternalLinks() {
@@ -48,11 +68,11 @@ function updateExternalLinks() {
   const btnRules = document.getElementById('btn-rules');
 
   if (currentState.mode === 'solos') {
-    btnBracket.href = "https://www.start.gg/tournament/mihsef-state-finals-fall-2025/event/ssbu-solos/brackets/2138160/3115114";
-    btnRules.href = "https://www.start.gg/tournament/mihsef-state-finals-fall-2025/event/ssbu-solos/overview/rules";
+    btnBracket.href = "https://fan.fenworks.com/Michigan";
+    btnRules.href = "/docs/game-manuals/ssbu-solos";
   } else {
-    btnBracket.href = "https://www.start.gg/tournament/mihsef-state-finals-fall-2025/event/crews-f25/brackets";
-    btnRules.href = "https://docs.google.com/document/d/1P_iYMinvXzrigq0bXCSGT2Rd9YZgdwlkId-mtmX7u0Y/edit?pli=1&tab=t.lpl0jweiwx22";
+    btnBracket.href = "https://fan.fenworks.com/Michigan";
+    btnRules.href = "/docs/game-manuals/ssbu-crews";
   }
 }
 
@@ -60,8 +80,8 @@ function updateExternalLinks() {
 // Step 0: Home Ban
 // Step 1: Away Ban
 // Step 2: Away Ban
-// Step 3: Home Ban
-// Step 4: Complete (Pick remaining)
+// Step 3: Home Pick
+// Step 4: Complete
 
 // Sequences
 const STEPS_SOLOS = [
@@ -88,8 +108,9 @@ const STEPS_CREWS = [
 function init() {
   renderStages();
   setupEventListeners();
-  updateProgressHTML(); // Initial call
-  updateRulesText(); // Initial call
+  updateProgressHTML();
+  updateRulesText();
+  updateFlowGuide();
   updateUI();
 }
 
@@ -234,8 +255,7 @@ function handleStageClick(stageId) {
     if (currentState.game === 1 && !isStarter) return;
   }
 
-  // PICK LOGIC
-  // Solos Step 3 is PICK. Crews Step 7 is PICK.
+  // PICK LOGIC: Solos Step 3 is PICK. Crews Step 7 is PICK.
   const isPickStep = (currentState.mode === 'solos' && currentState.step === 3) ||
     (currentState.mode === 'crews' && currentState.step === 7);
 
@@ -244,21 +264,14 @@ function handleStageClick(stageId) {
   if (isPickStep) {
     // Pick Logic: Ban all others
     let pool = currentState.mode === 'solos' ? starters : crewsPool;
-    // Current valid stages (not banned yet)
     const validStages = pool.filter(s => !currentState.bannedStages.some(b => b.id === s.id));
-
-    // Ban everyone except the clicked one
     validStages.forEach(s => {
       if (s.id !== stageId) {
-        // Auto ban logic? Or label as 'auto'?
-        // For simplicity, just ban them.
         currentState.bannedStages.push({ id: s.id, team: 'auto' });
       }
     });
-
     currentState.step++;
     updateUI();
-
   } else {
     // STANDARD BAN LOGIC
     currentState.bannedStages.push({ id: stageId, team: currentTeam.toLowerCase() }); // 'home' or 'away'

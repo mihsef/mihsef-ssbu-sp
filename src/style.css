@@ -521,3 +521,78 @@ h3 {
     font-size: 1rem;
   }
 }
+/* ===== MATCH FLOW GUIDE ===== */
+.flow-guide {
+  display: flex;
+  gap: 1rem;
+  margin: 0 1.5rem 1.5rem;
+  flex-wrap: wrap;
+}
+
+.flow-card {
+  flex: 1;
+  min-width: 240px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+
+.flow-title {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  opacity: 0.6;
+  margin-bottom: 0.6rem;
+}
+
+.flow-steps {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.flow-steps li {
+  line-height: 1.4;
+}
+
+.flow-team {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 1px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.flow-team.home {
+  background: rgba(100, 180, 255, 0.2);
+  color: #64b4ff;
+  border: 1px solid rgba(100, 180, 255, 0.3);
+}
+
+.flow-team.away {
+  background: rgba(255, 120, 120, 0.2);
+  color: #ff7878;
+  border: 1px solid rgba(255, 120, 120, 0.3);
+}
+
+.flow-team.winner {
+  background: rgba(255, 200, 60, 0.2);
+  color: #ffc83c;
+  border: 1px solid rgba(255, 200, 60, 0.3);
+}
+
+.flow-team.loser {
+  background: rgba(180, 180, 180, 0.15);
+  color: #bbb;
+  border: 1px solid rgba(180, 180, 180, 0.2);
+}
