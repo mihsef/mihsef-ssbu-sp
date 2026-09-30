@@ -4,9 +4,14 @@
   "description": "Michigan High School Esports Federation Super Smash Bros Ultimate Stage Ban & Match Coordinator",
   "icons": [
     {
-      "src": "/vite.svg",
-      "sizes": "192x192 512x512",
-      "type": "image/svg+xml",
+      "src": "/favicon.png",
+      "sizes": "150x80",
+      "type": "image/png"
+    },
+    {
+      "src": "/mihsef-crest.png",
+      "sizes": "400x400",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ],
