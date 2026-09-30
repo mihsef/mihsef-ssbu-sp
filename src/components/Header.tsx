@@ -4,8 +4,6 @@ import { MatchRoom, TeamRole } from '../types';
 
 interface HeaderProps {
   room: MatchRoom | null;
-  myRole?: TeamRole | null;
-  onSelectRole?: (role: TeamRole) => void;
   onReset: () => void;
   onUndo: () => void;
   canUndo: boolean;
@@ -13,8 +11,6 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   room,
-  myRole,
-  onSelectRole,
   onReset,
   onUndo,
   canUndo
@@ -150,36 +146,6 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-center">
-            {/* Quick Role Switcher Pill if role claimed */}
-            {myRole && onSelectRole && (
-              <div className="flex items-center p-1 rounded-xl bg-[#0a0c10] border border-[#262c3a] text-xs font-bold mr-1">
-                <button
-                  type="button"
-                  onClick={() => onSelectRole('home')}
-                  className={`px-2.5 py-1 rounded-lg transition-all text-xs ${
-                    myRole === 'home'
-                      ? 'bg-[#FF9933] text-black font-black shadow-sm'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                  title="Switch active device role to Home"
-                >
-                  Home Team
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onSelectRole('away')}
-                  className={`px-2.5 py-1 rounded-lg transition-all text-xs ${
-                    myRole === 'away'
-                      ? 'bg-[#05d9e8] text-black font-black shadow-sm'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                  title="Switch active device role to Away"
-                >
-                  Away Team
-                </button>
-              </div>
-            )}
-
             <button
               type="button"
               onClick={handleCopyLink}

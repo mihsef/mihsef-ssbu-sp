@@ -53,8 +53,6 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
   };
 
   const storedOfferId = getStoredOffer();
-  const mySecretStageId = myCommitment ? storedOfferId : null;
-  const mySecretStage = mySecretStageId ? pool.find((s) => s.id === mySecretStageId) : null;
 
   const currentStep = stepsConfig[battle?.stepIndex || 0];
   const isComplete = battle?.status === 'in_progress' || battle?.status === 'complete';
@@ -87,16 +85,16 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
       {/* 1. When stage is selected, show PROMINENT HERO DISPLAY */}
       {isComplete && selectedStage ? (
         <div className="space-y-4">
-          {/* Celebratory Mind Sync Connection Banner if mutual agreed */}
+          {/* Celebratory Friendly Agreement Banner if mutual agreed */}
           {isMutualAgreement && (
             <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-950/90 via-teal-900/70 to-emerald-950/90 border-2 border-emerald-400 text-center space-y-1.5 shadow-[0_0_35px_rgba(16,185,129,0.35)] animate-pulse">
               <div className="flex items-center justify-center gap-2 text-emerald-300 font-black text-sm sm:text-base uppercase tracking-widest font-outfit">
-                <Sparkles className="w-5 h-5 text-emerald-400 shrink-0" />
-                <span>⚡ Mind Sync Connection Achieved! ⚡</span>
-                <Sparkles className="w-5 h-5 text-emerald-400 shrink-0" />
+                <Handshake className="w-5 h-5 text-emerald-400 shrink-0" />
+                <span>🤝 Friendly Stage Agreement Reached! 🤝</span>
+                <Handshake className="w-5 h-5 text-emerald-400 shrink-0" />
               </div>
               <p className="text-xs sm:text-sm text-emerald-100 font-medium">
-                Both teams secretly picked <strong>{selectedStage.name}</strong> without speaking! The entire stage striking phase was bypassed by unanimous gentleman's choice.
+                Both teams offered <strong>{selectedStage.name}</strong>! Stage striking was bypassed by mutual agreement.
               </p>
             </div>
           )}
@@ -164,13 +162,13 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
           {mutual?.status === 'mismatched' && !dismissedMismatchNotice && (
             <div className="p-3.5 rounded-xl bg-purple-950/40 border border-purple-500/40 text-xs flex items-center justify-between gap-3 text-purple-200 shadow-md animate-in fade-in">
               <div className="flex items-center gap-2.5">
-                <Sparkles className="w-4 h-4 text-purple-400 shrink-0" />
+                <Handshake className="w-4 h-4 text-purple-400 shrink-0" />
                 <div>
                   <span className="font-extrabold uppercase tracking-wide text-purple-300 block">
-                    🎲 Wavelength Mismatch
+                    Friendly Stage Offers Differed
                   </span>
                   <span className="text-gray-300 text-[11px] leading-relaxed">
-                    Both teams made secret friendly offers, but picked different stages! Your choices remain confidential — proceeding to official stage bans.
+                    Both teams offered a friendly stage, but selected different stages. All choices remain confidential — proceeding to stage bans.
                   </span>
                 </div>
               </div>
@@ -195,7 +193,7 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
                     Notice: Friendly Offer Skipped
                   </span>
                   <span className="text-gray-300 text-[11px] leading-relaxed">
-                    {mutual.skippedBy.toUpperCase()} team started stage bans — your secret offer was cancelled. Proceeding with official striking sequence.
+                    {mutual.skippedBy.toUpperCase()} team started stage bans. Proceeding with stage bans.
                   </span>
                 </div>
               </div>
@@ -216,32 +214,32 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
               <button
                 type="button"
                 onClick={() => setGridMode('ban')}
-                className={`flex-1 py-2 px-3 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
+                className={`flex-1 py-2 px-3 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   gridMode === 'ban'
                     ? 'bg-[#FF9933] text-black shadow-md'
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
                 <Ban className="w-3.5 h-3.5" />
-                <span>Strike Stages ({isMyTurn ? 'Your Turn' : "Opponent's Turn"})</span>
+                <span>Strike Stages</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setGridMode('offer')}
-                className={`flex-1 py-2 px-3 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
+                className={`flex-1 py-2 px-3 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   gridMode === 'offer'
                     ? 'bg-emerald-500 text-black shadow-md'
                     : 'text-gray-400 hover:text-emerald-400'
                 }`}
               >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Mind Sync Challenge (Secret Offer)</span>
+                <Handshake className="w-3.5 h-3.5" />
+                <span>Offer Friendly</span>
               </button>
             </div>
           )}
 
-          {/* Active Mode Explanation & Mini-Game Status */}
+          {/* Active Mode Explanation & Status */}
           {isMutualPending && (
             <div className={`p-3.5 rounded-xl border text-xs transition-all ${
               myCommitment
@@ -253,24 +251,24 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
               {myCommitment ? (
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-start sm:items-center gap-2.5">
-                    <Sparkles className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5 sm:mt-0 animate-spin" />
+                    <Handshake className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5 sm:mt-0 animate-pulse" />
                     <div>
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex items-center gap-2">
                         <span className="font-extrabold text-white text-xs uppercase tracking-wide">
-                          Your Secret Sync Offer:
+                          Friendly Stage Offered
                         </span>
-                        <span className="px-2 py-0.5 rounded bg-emerald-500 text-black font-black text-xs">
-                          {mySecretStage?.name || 'Locked In'} 🔒
+                        <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-xs border border-emerald-500/30">
+                          Submitted 🔒
                         </span>
                       </div>
                       <p className="text-[11px] text-gray-300 mt-0.5">
                         {oppCommitment ? (
                           <strong className="text-emerald-300">
-                            Opponent also locked in their secret pick! Comparing wavelengths...
+                            Opponent also submitted an offer! Checking for agreement...
                           </strong>
                         ) : (
                           <span>
-                            Waiting to see if opponent is on your wavelength... (or click any stage to ban directly)
+                            Waiting on opponent... (or strike any stage below to proceed with bans)
                           </span>
                         )}
                       </p>
@@ -280,29 +278,29 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
                   <button
                     type="button"
                     onClick={handleCancelOffer}
-                    className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 rounded-lg text-xs font-bold transition-all active:scale-95 shrink-0"
+                    className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 rounded-lg text-xs font-bold transition-all active:scale-95 shrink-0 cursor-pointer"
                   >
                     <Undo2 className="w-3.5 h-3.5" />
-                    <span>Change / Undo Offer</span>
+                    <span>Cancel Offer</span>
                   </button>
                 </div>
               ) : gridMode === 'offer' ? (
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-2.5">
-                    <Sparkles className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <Handshake className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                     <div>
                       <span className="font-extrabold text-emerald-400 uppercase tracking-wide block">
-                        🔮 The Gentleman's Mind Sync Challenge
+                        🤝 Offer Friendly Stage Agreement
                       </span>
                       <p className="text-gray-300 text-[11px] leading-relaxed mt-0.5">
-                        Tap any stage below to secretly nominate it. If both teams pick the same stage without speaking, you jump straight into battle! If choices differ or either team starts banning, picks stay 100% confidential.
+                        Select a stage below to offer. If both teams offer the same stage, it is locked in automatically and bans are bypassed. Selections remain confidential.
                       </p>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => setGridMode('ban')}
-                    className="text-gray-400 hover:text-white font-bold text-xs shrink-0 underline"
+                    className="text-gray-400 hover:text-white font-bold text-xs shrink-0 underline cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -311,7 +309,7 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
                 <div className="flex items-center gap-2 text-gray-400">
                   <Ban className="w-4 h-4 text-gray-500 shrink-0" />
                   <span>
-                    Banning active. (Tapping any ban below automatically skips friendly stage offer).
+                    Stage striking active. (Selecting a stage to ban will skip friendly offers).
                   </span>
                 </div>
               )}
@@ -413,7 +411,6 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
               const banData = battle?.bannedStages.find((b) => b.stageId === stage.id);
               const isBanned = !!banData;
               const isPicked = battle?.selectedStageId === stage.id;
-              const isMySecretChoice = mySecretStageId === stage.id;
 
               const isOfferingMode = gridMode === 'offer' && isMutualPending && !myCommitment;
               const canClick = isOfferingMode ? !isBanned : isMyTurn && !isBanned && !isComplete;
@@ -427,8 +424,6 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
                   className={`group relative rounded-xl overflow-hidden border text-left transition-all ${
                     isPicked
                       ? 'border-emerald-500 ring-2 ring-emerald-500 scale-[1.02] shadow-lg'
-                      : isMySecretChoice
-                      ? 'border-emerald-400 ring-2 ring-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.35)] scale-[1.01]'
                       : isBanned
                       ? 'border-red-950/60 opacity-40 grayscale cursor-not-allowed'
                       : isOfferingMode
@@ -443,14 +438,6 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
                     alt={stage.name}
                     className="w-full h-24 sm:h-28 object-cover"
                   />
-
-                  {/* My Secret Offer Badge Overlay */}
-                  {isMySecretChoice && (
-                    <div className="absolute top-2 right-2 bg-emerald-500 text-black font-black text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full shadow-lg flex items-center gap-1 z-10 animate-pulse">
-                      <Sparkles className="w-3 h-3" />
-                      <span>YOUR SECRET OFFER</span>
-                    </div>
-                  )}
 
                   {/* Banned Overlay */}
                   {isBanned && (

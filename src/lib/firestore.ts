@@ -234,6 +234,13 @@ export async function revealMutualChoice(
         // MISMATCH
         mutual.status = 'mismatched';
       }
+
+      // CRITICAL FOR PRIVACY:
+      // Strip all revealed stage data, salts, and commitments immediately upon resolution
+      delete mutual.homeRevealed;
+      delete mutual.awayRevealed;
+      delete mutual.homeCommitment;
+      delete mutual.awayCommitment;
     }
 
     txn.update(roomRef, {
@@ -253,11 +260,15 @@ export async function skipMutualStage(roomId: string, byRole?: TeamRole): Promis
     const data = snap.data() as MatchRoom;
     const newHistory = createSnapshotHistory(data);
 
-    const mutual = data.mutualStage || { enabled: false, status: 'skipped' };
+    const mutual = { ...(data.mutualStage || { enabled: false, status: 'skipped' as const }) };
     mutual.status = 'skipped';
     if (byRole) {
       mutual.skippedBy = byRole;
     }
+    delete mutual.homeCommitment;
+    delete mutual.awayCommitment;
+    delete mutual.homeRevealed;
+    delete mutual.awayRevealed;
 
     txn.update(roomRef, {
       mutualStage: mutual,
@@ -290,6 +301,10 @@ export async function banOrPickStage(
     let mutual = data.mutualStage;
     if (mutual && mutual.status === 'pending') {
       mutual = { ...mutual, status: 'skipped', skippedBy: byRole };
+      delete mutual.homeCommitment;
+      delete mutual.awayCommitment;
+      delete mutual.homeRevealed;
+      delete mutual.awayRevealed;
     }
 
     const isGame1 = battle.battleNumber === 1;

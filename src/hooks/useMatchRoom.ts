@@ -136,10 +136,15 @@ export function useMatchRoom() {
     [roomId, myRole]
   );
 
-  // Auto-reveal if both commitments exist
+  // Auto-reveal if both commitments exist, and clean up session when resolved
   useEffect(() => {
     if (!roomId || !myRole || !room?.mutualStage) return;
     const mutual = room.mutualStage;
+
+    if (['agreed', 'mismatched', 'skipped'].includes(mutual.status)) {
+      sessionStorage.removeItem(`ssbu_mutual_${roomId}_${myRole}`);
+      return;
+    }
 
     if (mutual.homeCommitment && mutual.awayCommitment && mutual.status === 'pending') {
       const stored = sessionStorage.getItem(`ssbu_mutual_${roomId}_${myRole}`);

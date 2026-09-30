@@ -60,8 +60,6 @@ export const App: React.FC = () => {
       <div className="w-full max-w-3xl">
         <Header
           room={room}
-          myRole={myRole}
-          onSelectRole={selectRole}
           onReset={handleReset}
           onUndo={handleUndo}
           canUndo={canUndo}
