@@ -122,7 +122,7 @@ export const BattleProgressionStep: React.FC<BattleProgressionStepProps> = ({
                 <strong className="text-white">Loser picks</strong> the battle stage from the remaining stages.
               </li>
               <li className="text-amber-300 font-semibold">
-                Dave's Stupid Rule (DSR): You CANNOT pick a stage your team has already won on in this match!
+                Dave's Stupid Rule (DSR): You CANNOT pick a stage your team has already won on in this match! (You are permitted to pick a stage the other team won on).
               </li>
             </ol>
           </div>

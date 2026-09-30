@@ -357,12 +357,12 @@ export async function recordBattleWinner(
       data.matchComplete = true;
       data.matchWinner = newScores.home >= 2 ? 'home' : 'away';
     } else {
-      // Prepare next battle with DSR!
-      const nextBattleNumber = data.currentBattleIndex + 2;
+      // The loser of this completed battle will be the team picking in the next battle
+      const nextBattleLoser = winnerRole === 'home' ? 'away' : 'home';
 
-      // Collect all stages previously won by either team
+      // DSR: Only auto-ban stages that the picking team (nextBattleLoser) has already won on in this match
       const autoBans = data.battles
-        .filter((b) => b.winner && b.selectedStageId)
+        .filter((b) => b.winner === nextBattleLoser && b.selectedStageId)
         .map((b) => ({
           stageId: b.selectedStageId!,
           by: 'auto' as const,
