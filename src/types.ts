@@ -56,7 +56,7 @@ export interface MatchRoom {
   homeConnected: boolean;
   awayConnected: boolean;
 
-  // Phase 2.5: Arena Lobby Info
+  // Switch Arena Lobby Info (Optional)
   arena?: ArenaInfo;
 
   // Phase 3: Mutual Friendly Starting Stage Pick

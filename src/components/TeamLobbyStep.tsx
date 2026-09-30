@@ -101,32 +101,38 @@ export const TeamLobbyStep: React.FC<TeamLobbyStepProps> = ({
         </div>
       </div>
 
-      {/* Phase 2.5: Arena Lobby Info */}
+      {/* Switch Arena Lobby Info (Optional) */}
       {myRole && (
-        <div className="p-4 rounded-xl bg-[#0a0c10] border border-[#262c3a] mt-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Radio className="w-4 h-4 text-[#FF9933] animate-pulse" />
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider font-outfit">
-              Phase 2.5: Smash Arena Connection
-            </h3>
+        <div className="p-4 rounded-xl bg-[#0a0c10] border border-[#262c3a] mt-4 space-y-3">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <Radio className="w-4 h-4 text-[#FF9933]" />
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider font-outfit">
+                Switch Arena Connection (Optional)
+              </h3>
+            </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-800 text-gray-400 uppercase tracking-wider">
+              Skip if playing offline
+            </span>
           </div>
 
+          <p className="text-xs text-gray-400 leading-relaxed">
+            If you're playing in-person or already shared credentials over Discord, <strong>you can skip this</strong> and proceed straight to stage selection below.
+          </p>
+
           {myRole === 'home' ? (
-            <form onSubmit={handleArenaSubmit} className="space-y-3">
-              <p className="text-xs text-gray-300">
-                As the <strong>Home Team</strong>, please create the in-game Smash Arena and enter the credentials below so the Away team can join immediately:
-              </p>
+            <form onSubmit={handleArenaSubmit} className="space-y-3 pt-1">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
                   <label className="text-[11px] font-semibold text-gray-400 uppercase block mb-1">
-                    Arena ID (5-character Switch code)
+                    Arena ID (Optional 5-char code)
                   </label>
                   <input
                     type="text"
                     value={arenaIdInput}
                     onChange={(e) => setArenaIdInput(e.target.value.toUpperCase())}
                     maxLength={10}
-                    placeholder="e.g. 7KW9P"
+                    placeholder="e.g. 7KW9P or leave blank"
                     className="w-full bg-[#14171f] border border-[#262c3a] focus:border-[#FF9933] focus:outline-none rounded-lg px-3 py-2 text-sm text-white font-mono uppercase"
                   />
                 </div>
@@ -146,7 +152,7 @@ export const TeamLobbyStep: React.FC<TeamLobbyStepProps> = ({
               <button
                 type="submit"
                 disabled={!arenaIdInput.trim()}
-                className="px-4 py-2 bg-[#FF9933] hover:bg-[#ffad55] disabled:opacity-50 text-black font-bold rounded-lg text-xs uppercase tracking-wider transition-all"
+                className="px-4 py-2 bg-[#FF9933] hover:bg-[#ffad55] disabled:opacity-40 text-black font-bold rounded-lg text-xs uppercase tracking-wider transition-all"
               >
                 {room.arena?.id ? 'Update Arena Details' : 'Broadcast Arena to Away'}
               </button>
@@ -187,9 +193,8 @@ export const TeamLobbyStep: React.FC<TeamLobbyStepProps> = ({
                   </button>
                 </div>
               ) : (
-                <div className="text-xs text-gray-400 flex items-center gap-2 p-3 bg-[#14171f] rounded-lg border border-[#262c3a]">
-                  <div className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-                  <span>Waiting for the Home Team to provide the Switch Arena ID and password...</span>
+                <div className="text-xs text-gray-400 p-3 bg-[#14171f] rounded-lg border border-[#262c3a] leading-relaxed">
+                  No online arena code posted yet (optional if playing in-person or sharing via Discord). You can proceed straight to stage bans below.
                 </div>
               )}
             </div>

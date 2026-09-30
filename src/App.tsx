@@ -40,12 +40,12 @@ export const App: React.FC = () => {
 
   // Active step computation:
   // Step 1: Room Join & Share
-  // Step 2: Role & Arena
+  // Step 2: Role & Arena (Arena optional)
   // Step 3: Game 1 Stage Striking (Friendly nomination embedded)
   // Step 4: Subsequent Battles, Character Declarations & Results
   const activeStepNumber = !hasRoom
     ? 1
-    : !hasRole || (myRole === 'home' && !hasArena)
+    : !hasRole
     ? 2
     : !isBattle1Selected
     ? 3
@@ -91,11 +91,11 @@ export const App: React.FC = () => {
           />
         </StepCard>
 
-        {/* Phase 2 & 2.5: Role & Arena Connection */}
+        {/* Step 2: Role & Arena Connection (Arena Optional) */}
         <StepCard
           stepNumber="2"
-          title="Team Role & Arena Lobby"
-          isCompleted={hasRole && (myRole === 'away' || hasArena)}
+          title="Team Role & Arena Lobby (Optional)"
+          isCompleted={hasRole}
           isActive={activeStepNumber === 2}
           summary={
             hasRole ? (
