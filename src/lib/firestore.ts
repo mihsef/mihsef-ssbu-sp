@@ -39,6 +39,10 @@ export function getInitialRoom(roomId: string, mode: 'crews' | 'solos' = 'crews'
     battles: [initialBattle],
     scores: { home: 0, away: 0 },
     matchComplete: false,
+    mutualStage: {
+      enabled: true,
+      status: 'pending'
+    },
     history: []
   };
 }

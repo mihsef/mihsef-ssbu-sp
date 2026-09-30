@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertTriangle, Check, Ban, Swords, EyeOff, Sparkles, ChevronDown, ChevronUp, Undo2 } from 'lucide-react';
+import { AlertTriangle, Check, Ban, Swords, EyeOff, Sparkles, ChevronDown, ChevronUp, Undo2, Handshake } from 'lucide-react';
 import { MatchRoom, TeamRole, Stage } from '../types';
 import { CREWS_POOL, SOLOS_STARTERS, CREWS_GAME1_STEPS, SOLOS_GAME1_STEPS } from '../data/stages';
 import { SelectedStageHero } from './SelectedStageHero';
@@ -27,11 +27,11 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
   const pool = room.mode === 'crews' ? CREWS_POOL : SOLOS_STARTERS;
   const stepsConfig = room.mode === 'crews' ? CREWS_GAME1_STEPS : SOLOS_GAME1_STEPS;
 
-  const [selectedMutualId, setSelectedMutualId] = useState<string>('');
+  const [gridMode, setGridMode] = useState<'ban' | 'offer'>('ban');
   const [showBanHistory, setShowBanHistory] = useState<boolean>(false);
 
   const mutual = room.mutualStage;
-  const isMutualPending = mutual && mutual.status === 'pending';
+  const isMutualPending = !mutual || mutual.status === 'pending';
   const myCommitment = myRole === 'home' ? mutual?.homeCommitment : mutual?.awayCommitment;
   const oppCommitment = myRole === 'home' ? mutual?.awayCommitment : mutual?.homeCommitment;
 
@@ -43,14 +43,17 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
     ? pool.find((s) => s.id === battle.selectedStageId)
     : null;
 
-  const handleConfirmMutual = () => {
-    if (selectedMutualId && onProposeMutual && !myCommitment) {
-      onProposeMutual(selectedMutualId);
+  const handleStageClick = (stageId: string) => {
+    if (gridMode === 'offer' && onProposeMutual && !myCommitment) {
+      onProposeMutual(stageId);
+      setGridMode('ban');
+    } else {
+      onStageAction(stageId);
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* 1. When stage is selected, show PROMINENT HERO DISPLAY */}
       {isComplete && selectedStage ? (
         <div className="space-y-4">
@@ -58,7 +61,7 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
             stage={selectedStage}
             battleNumber={1}
             mode={room.mode}
-            subheading="Battle 1 starting stage selected via official MiHSEF striking procedure."
+            subheading="Battle 1 starting stage locked in. Play until entire team is eliminated."
           />
 
           {/* Undo final selection if misclicked */}
@@ -110,67 +113,67 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
         </div>
       ) : (
         <>
-          {/* 2. Optional Blind Friendly Stage Agreement Banner (if still pending) */}
+          {/* 2. Unified Striking & Friendly Action Mode Bar */}
+          {isMutualPending && !myCommitment && (
+            <div className="flex items-center justify-between gap-2 p-1.5 bg-[#14171f] border border-[#262c3a] rounded-xl">
+              <button
+                type="button"
+                onClick={() => setGridMode('ban')}
+                className={`flex-1 py-2 px-3 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
+                  gridMode === 'ban'
+                    ? 'bg-[#FF9933] text-black shadow-md'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <Ban className="w-3.5 h-3.5" />
+                <span>Strike Stages ({isMyTurn ? 'Your Turn' : "Opponent's Turn"})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setGridMode('offer')}
+                className={`flex-1 py-2 px-3 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
+                  gridMode === 'offer'
+                    ? 'bg-emerald-500 text-black shadow-md'
+                    : 'text-gray-400 hover:text-emerald-400'
+                }`}
+              >
+                <Handshake className="w-3.5 h-3.5" />
+                <span>Secretly Offer Friendly Stage</span>
+              </button>
+            </div>
+          )}
+
+          {/* Active Mode Explanation & Status */}
           {isMutualPending && (
-            <div className="p-4 rounded-xl bg-[#14171f] border border-[#262c3a] space-y-3 shadow-md">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <div className="flex items-center gap-2 text-[#FF9933] font-bold text-xs uppercase tracking-wider font-outfit">
-                  <EyeOff className="w-4 h-4" />
-                  <span>Optional: Blind Friendly Stage Agreement</span>
-                </div>
-                <div className="flex items-center gap-3 text-[11px] text-gray-400">
-                  <span className={myCommitment ? 'text-emerald-400 font-bold' : ''}>
-                    You: {myCommitment ? '✓ Locked' : 'Pending'}
-                  </span>
-                  <span>•</span>
-                  <span className={oppCommitment ? 'text-emerald-400 font-bold' : ''}>
-                    Opponent: {oppCommitment ? '✓ Locked' : 'Pending'}
-                  </span>
-                </div>
+            <div className="p-3 rounded-xl bg-[#0a0c10] border border-[#262c3a] flex items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2">
+                <Handshake className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span className="text-gray-300">
+                  {gridMode === 'offer' && !myCommitment ? (
+                    <strong className="text-emerald-400">
+                      Tap any stage below to secretly offer it to your opponent.
+                    </strong>
+                  ) : myCommitment ? (
+                    <span className="text-emerald-300 font-semibold">
+                      ✓ Your secret friendly offer is locked. Waiting on opponent, or click any stage to ban.
+                    </span>
+                  ) : (
+                    <span>
+                      Banning active. (Tapping any ban below automatically skips friendly stage offer).
+                    </span>
+                  )}
+                </span>
               </div>
 
-              <p className="text-xs text-gray-300 leading-relaxed">
-                Secretly nominate a stage below. If your pick matches opponent's, it locks in instantly! If you begin banning stages below, friendly agreement is automatically bypassed.
-              </p>
-
-              {!myCommitment ? (
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
-                  <select
-                    value={selectedMutualId}
-                    onChange={(e) => setSelectedMutualId(e.target.value)}
-                    className="flex-1 bg-[#0a0c10] border border-[#262c3a] rounded-xl px-3 py-2 text-xs text-white focus:border-[#FF9933] focus:outline-none"
-                  >
-                    <option value="">Select a stage to nominate secretly...</option>
-                    {pool.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.name}
-                      </option>
-                    ))}
-                  </select>
-
-                  <button
-                    type="button"
-                    disabled={!selectedMutualId}
-                    onClick={handleConfirmMutual}
-                    className="px-4 py-2 bg-[#FF9933] hover:bg-[#ffad55] disabled:opacity-40 text-black font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md shrink-0"
-                  >
-                    Lock Secret Pick
-                  </button>
-
-                  {onOptOutMutual && (
-                    <button
-                      type="button"
-                      onClick={onOptOutMutual}
-                      className="px-3 py-2 bg-transparent hover:bg-gray-800 text-gray-400 hover:text-white text-xs font-semibold rounded-xl transition-all shrink-0"
-                    >
-                      Decline &amp; Strike
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <div className="p-2.5 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-xs text-emerald-300 flex items-center justify-between">
-                  <span>✓ Your secret nomination is locked. Waiting for opponent or proceed to strikes below.</span>
-                </div>
+              {isMutualPending && !myCommitment && gridMode === 'offer' && (
+                <button
+                  type="button"
+                  onClick={() => setGridMode('ban')}
+                  className="text-gray-400 hover:text-white font-bold text-[11px] shrink-0 underline"
+                >
+                  Cancel Offer
+                </button>
               )}
             </div>
           )}
@@ -198,8 +201,8 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
             </div>
           </div>
 
-          {/* 4. Striking Turn Sequence Header */}
-          {!isComplete && currentStep && (
+          {/* 4. Striking Turn Sequence Header (shown in Ban mode) */}
+          {!isComplete && currentStep && gridMode === 'ban' && (
             <div className="space-y-2">
               {/* Progress Sequence Bubbles */}
               <div className="flex items-center justify-between gap-1 overflow-x-auto pb-1">
@@ -246,7 +249,7 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
             </div>
           )}
 
-          {/* High-Visibility Undo Bar right by the stages */}
+          {/* High-Visibility Undo Bar right above stages */}
           {canUndo && onUndo && (
             <div className="flex items-center justify-between p-2.5 px-4 rounded-xl bg-amber-500/15 border-2 border-amber-500/50 shadow-md">
               <div className="flex items-center gap-2 text-xs font-bold text-amber-200">
@@ -256,7 +259,7 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
               <button
                 type="button"
                 onClick={onUndo}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase tracking-wider rounded-lg shadow-md transition-all active:scale-95 shrink-0"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase tracking-wider rounded-lg shadow-md transition-all active:scale-95 shrink-0"
               >
                 <Undo2 className="w-3.5 h-3.5" />
                 Undo Last Ban
@@ -264,25 +267,29 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
             </div>
           )}
 
-          {/* 5. Stages Grid for Striking */}
+          {/* 5. Stages Grid for Striking & Mutual Offering */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {pool.map((stage) => {
               const banData = battle?.bannedStages.find((b) => b.stageId === stage.id);
               const isBanned = !!banData;
               const isPicked = battle?.selectedStageId === stage.id;
-              const canClick = isMyTurn && !isBanned && !isComplete;
+
+              const isOfferingMode = gridMode === 'offer' && isMutualPending && !myCommitment;
+              const canClick = isOfferingMode ? !isBanned : isMyTurn && !isBanned && !isComplete;
 
               return (
                 <button
                   key={stage.id}
                   type="button"
                   disabled={!canClick}
-                  onClick={() => onStageAction(stage.id)}
+                  onClick={() => handleStageClick(stage.id)}
                   className={`group relative rounded-xl overflow-hidden border text-left transition-all ${
                     isPicked
                       ? 'border-emerald-500 ring-2 ring-emerald-500 scale-[1.02] shadow-lg'
                       : isBanned
                       ? 'border-red-950/60 opacity-40 grayscale cursor-not-allowed'
+                      : isOfferingMode
+                      ? 'border-emerald-500/40 hover:border-emerald-400 hover:scale-[1.02] cursor-pointer shadow-md'
                       : canClick
                       ? 'border-[#262c3a] hover:border-[#FF9933] hover:scale-[1.02] cursor-pointer shadow-md'
                       : 'border-[#262c3a] opacity-80 cursor-not-allowed'
@@ -319,8 +326,12 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
                       {stage.name}
                     </span>
                     {canClick && (
-                      <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-[#FF9933] text-black shrink-0">
-                        {currentStep?.action === 'pick' ? 'PICK' : 'BAN'}
+                      <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded shrink-0 ${
+                        isOfferingMode
+                          ? 'bg-emerald-400 text-black'
+                          : 'bg-[#FF9933] text-black'
+                      }`}>
+                        {isOfferingMode ? 'OFFER' : currentStep?.action === 'pick' ? 'PICK' : 'BAN'}
                       </span>
                     )}
                   </div>
