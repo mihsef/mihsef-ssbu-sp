@@ -221,7 +221,7 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
                 }`}
               >
                 <Ban className="w-3.5 h-3.5" />
-                <span>Strike Stages</span>
+                <span>Strike Stages (Standard)</span>
               </button>
 
               <button
@@ -235,6 +235,13 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
               >
                 <Handshake className="w-3.5 h-3.5" />
                 <span>Offer Friendly</span>
+                <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded uppercase tracking-wider ml-1 ${
+                  gridMode === 'offer'
+                    ? 'bg-black/25 text-black'
+                    : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                }`}>
+                  Optional
+                </span>
               </button>
             </div>
           )}
@@ -253,12 +260,15 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
                   <div className="flex items-start sm:items-center gap-2.5">
                     <Handshake className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5 sm:mt-0 animate-pulse" />
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-extrabold text-white text-xs uppercase tracking-wide">
                           Friendly Stage Offered
                         </span>
                         <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-xs border border-emerald-500/30">
                           Submitted 🔒
+                        </span>
+                        <span className="text-[10px] text-gray-400 font-normal">
+                          (Optional — you can cancel or strike stages at any time)
                         </span>
                       </div>
                       <p className="text-[11px] text-gray-300 mt-0.5">
@@ -268,7 +278,7 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
                           </strong>
                         ) : (
                           <span>
-                            Waiting on opponent... (or strike any stage below to proceed with bans)
+                            Waiting on opponent... (Optional — tap any stage below to strike or cancel offer)
                           </span>
                         )}
                       </p>
@@ -289,11 +299,16 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
                   <div className="flex items-start gap-2.5">
                     <Handshake className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                     <div>
-                      <span className="font-extrabold text-emerald-400 uppercase tracking-wide block">
-                        🤝 Offer Friendly Stage Agreement
-                      </span>
-                      <p className="text-gray-300 text-[11px] leading-relaxed mt-0.5">
-                        Select a stage below to offer. If both teams offer the same stage, it is locked in automatically and bans are bypassed. Selections remain confidential.
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-extrabold text-emerald-400 uppercase tracking-wide">
+                          🤝 Offer Friendly Stage Agreement
+                        </span>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-wider">
+                          Optional
+                        </span>
+                      </div>
+                      <p className="text-gray-300 text-[11px] leading-relaxed mt-1">
+                        <strong>Completely optional gentleman's agreement:</strong> Both teams can optionally offer a stage. If both independently choose the same stage, stage bans are bypassed entirely. If choices differ or either team starts striking stages, standard stage striking proceeds.
                       </p>
                     </div>
                   </div>
@@ -302,15 +317,21 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
                     onClick={() => setGridMode('ban')}
                     className="text-gray-400 hover:text-white font-bold text-xs shrink-0 underline cursor-pointer"
                   >
-                    Cancel
+                    Back to Striking
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center gap-2 text-gray-400">
-                  <Ban className="w-4 h-4 text-gray-500 shrink-0" />
-                  <span>
-                    Stage striking active. (Selecting a stage to ban will skip friendly offers).
-                  </span>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-gray-300">
+                    <Ban className="w-4 h-4 text-[#FF9933] shrink-0" />
+                    <span>
+                      <strong>Standard Stage Striking:</strong> Tap stages below to strike on your turn.
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-gray-400 flex items-center gap-1.5 shrink-0 bg-[#14171f] px-2.5 py-1 rounded-lg border border-[#262c3a]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span>Offering a friendly is <strong>100% optional</strong></span>
+                  </div>
                 </div>
               )}
             </div>
