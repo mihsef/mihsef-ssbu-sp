@@ -67,9 +67,11 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="text-[10px] font-black tracking-widest px-2 py-0.5 rounded bg-[#FF9933]/15 text-[#FF9933] border border-[#FF9933]/30 uppercase font-mono">
                 MIHSEF OFFICIAL
               </span>
-              <span className="text-[11px] text-gray-400 font-mono">
-                {room?.mode === 'crews' ? 'CREWS (9-STOCK 3v3)' : 'SOLOS (1v1)'}
-              </span>
+              {room && (
+                <span className="text-[11px] text-gray-400 font-mono">
+                  {room.mode === 'crews' ? 'CREWS (9-STOCK 3v3)' : 'SOLOS (1v1)'}
+                </span>
+              )}
             </div>
             <h1 className="text-xl sm:text-2xl font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] via-orange-400 to-[#05d9e8] font-outfit uppercase mt-0.5 group-hover:opacity-90">
               SSBU Stage Wizard

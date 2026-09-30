@@ -91,7 +91,7 @@ export const RoomJoinStep: React.FC<RoomJoinStepProps> = ({ room, onJoin, loadin
               {room.roomId}
             </div>
             <span className="text-xs text-gray-400 mt-1 block">
-              Format: <strong className="text-gray-200 uppercase">{room.mode}</strong> (Best of 3)
+              Format: <strong className="text-gray-200 uppercase">{room.mode}</strong> ({room.mode === 'crews' ? 'Best of 3' : 'Best of 5'})
             </span>
           </div>
 
