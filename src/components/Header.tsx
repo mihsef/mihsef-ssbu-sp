@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { RotateCcw, Undo2, ExternalLink, Hash, Copy, Check, Share2, Plus } from 'lucide-react';
+import { RotateCcw, Undo2, ExternalLink, Hash, Copy, Check, Share2, Plus, Swords } from 'lucide-react';
 import { MatchRoom, TeamRole } from '../types';
+import { CREWS_POOL } from '../data/stages';
 
 interface HeaderProps {
   room: MatchRoom | null;
@@ -132,50 +133,98 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Prominent Large Room ID, Share & Multi-Device Header Bar */}
       {room && (
-        <div className="p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-[#14171f] via-[#1b202b] to-[#14171f] border-2 border-[#FF9933]/60 shadow-[0_0_20px_rgba(255,153,51,0.12)] flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-3 text-center sm:text-left">
-            <div className="p-2 sm:p-2.5 rounded-xl bg-[#FF9933]/15 border border-[#FF9933]/40 text-[#FF9933] shrink-0">
-              <Hash className="w-5 h-5 sm:w-6 sm:h-6" />
-            </div>
-            <div>
-              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-gray-400 block font-mono">
-                Match Room Code
-              </span>
-              <div className="text-2xl sm:text-3xl font-black font-mono tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] to-amber-200">
-                {room.roomId}
+        <div className="p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-[#14171f] via-[#1b202b] to-[#14171f] border-2 border-[#FF9933]/60 shadow-[0_0_20px_rgba(255,153,51,0.12)] space-y-3">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-3 text-center sm:text-left">
+              <div className="p-2 sm:p-2.5 rounded-xl bg-[#FF9933]/15 border border-[#FF9933]/40 text-[#FF9933] shrink-0">
+                <Hash className="w-5 h-5 sm:w-6 sm:h-6" />
+              </div>
+              <div>
+                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-gray-400 block font-mono">
+                  Match Room Code
+                </span>
+                <div className="text-2xl sm:text-3xl font-black font-mono tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-[#FF9933] to-amber-200">
+                  {room.roomId}
+                </div>
               </div>
             </div>
+
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-center">
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2 bg-[#FF9933] hover:bg-[#ffad55] text-black font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-md active:scale-95 cursor-pointer"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-4 h-4 text-black" />
+                    <span>Link Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 text-black" />
+                    <span>Copy Link</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleShare}
+                className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2 bg-[#1b202a] hover:bg-[#262c3a] text-gray-200 border border-gray-700 hover:border-gray-500 font-bold text-xs uppercase tracking-wider rounded-xl transition-all active:scale-95 cursor-pointer"
+                title="Share match link with opposing coach / team"
+              >
+                <Share2 className="w-4 h-4 text-[#05d9e8]" />
+                <span>Share</span>
+              </button>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-center">
-            <button
-              type="button"
-              onClick={handleCopyLink}
-              className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2 bg-[#FF9933] hover:bg-[#ffad55] text-black font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-md active:scale-95 cursor-pointer"
-            >
-              {copied ? (
-                <>
-                  <Check className="w-4 h-4 text-black" />
-                  <span>Link Copied!</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-4 h-4 text-black" />
-                  <span>Copy Link</span>
-                </>
-              )}
-            </button>
+          {/* Running Match History: Stages Played & Winners At A Glance */}
+          {room.battles.some((b) => b.selectedStageId) && (
+            <div className="pt-2.5 border-t border-[#262c3a] flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 font-mono flex items-center gap-1.5 shrink-0">
+                <Swords className="w-3.5 h-3.5 text-[#FF9933]" />
+                <span>Match Stages:</span>
+              </span>
 
-            <button
-              type="button"
-              onClick={handleShare}
-              className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2 bg-[#1b202a] hover:bg-[#262c3a] text-gray-200 border border-gray-700 hover:border-gray-500 font-bold text-xs uppercase tracking-wider rounded-xl transition-all active:scale-95 cursor-pointer"
-              title="Share match link with opposing coach / team"
-            >
-              <Share2 className="w-4 h-4 text-[#05d9e8]" />
-              <span>Share</span>
-            </button>
-          </div>
+              <div className="flex flex-wrap items-center gap-2">
+                {room.battles
+                  .filter((b) => b.selectedStageId)
+                  .map((b) => {
+                    const stageName = CREWS_POOL.find((s) => s.id === b.selectedStageId)?.name || b.selectedStageId;
+                    return (
+                      <div
+                        key={b.battleNumber}
+                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0a0c10] border border-[#262c3a] text-xs shadow-sm"
+                      >
+                        <span className="font-mono text-gray-400 font-bold">
+                          G{b.battleNumber}:
+                        </span>
+                        <span className="font-bold text-white">
+                          {stageName}
+                        </span>
+                        {b.winner ? (
+                          <span
+                            className={`text-[10px] font-black px-1.5 py-0.2 rounded font-mono uppercase tracking-wider ${
+                              b.winner === 'home'
+                                ? 'bg-[#FF9933]/20 text-[#FF9933] border border-[#FF9933]/40'
+                                : 'bg-[#05d9e8]/20 text-[#05d9e8] border border-[#05d9e8]/40'
+                            }`}
+                          >
+                            {b.winner.toUpperCase()} WIN
+                          </span>
+                        ) : (
+                          <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-wider animate-pulse font-mono">
+                            IN PLAY
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </header>

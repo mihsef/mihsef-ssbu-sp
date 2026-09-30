@@ -411,6 +411,13 @@ export const BattleProgressionStep: React.FC<BattleProgressionStepProps> = ({
               const isAutoBanned = banData?.by === 'auto';
               const isBanned = !!banData;
 
+              // Find which team won on this stage in a prior battle (Home or Away)
+              const previousWinBattle = room.battles.find(
+                (b) => b.selectedStageId === stage.id && b.status === 'complete' && b.winner
+              );
+              const winnerRole = previousWinBattle?.winner;
+              const winnerLabel = winnerRole === 'home' ? 'Home' : winnerRole === 'away' ? 'Away' : null;
+
               const bansNeeded = room.mode === 'crews' ? 3 : 2;
               const bansMade = currentBattle.bannedStages.filter((b) => b.by !== 'auto').length;
               const isWinnerBanning = bansMade < bansNeeded;
@@ -447,7 +454,9 @@ export const BattleProgressionStep: React.FC<BattleProgressionStepProps> = ({
                       <span className="text-[10px] font-black uppercase tracking-wider text-amber-300">
                         Auto-Banned (DSR)
                       </span>
-                      <span className="text-[9px] text-gray-400">Your Previous Win</span>
+                      <span className="text-[10px] font-semibold text-gray-300">
+                        {winnerLabel ? `${winnerLabel} Previous Win` : 'Previous Win'}
+                      </span>
                     </div>
                   )}
 
