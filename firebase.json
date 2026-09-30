@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "mihsef-ssbu",
     "public": "dist",
     "ignore": [
       "firebase.json",
