@@ -1,0 +1,189 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: ssbu_rooms
+    // Document ID: {roomId} (string, 1-64 chars)
+    // Fields:
+    //   - roomId: string (required, 1-64 chars) - Match/room code
+    //   - createdAt: number (required, > 0) - Creation timestamp in ms (Date.now())
+    //   - lastUpdated: number (required, > 0) - Last updated timestamp in ms (Date.now())
+    //   - mode: string (required, 'crews' | 'solos') - SSBU game mode
+    //   - homeConnected: bool (required) - Presence flag for Home team
+    //   - awayConnected: bool (required) - Presence flag for Away team
+    //   - currentBattleIndex: number (required, 0-10) - Active battle index
+    //   - battles: list (required, <= 20 items) - Battle state and striking sequence
+    //   - scores: map (required) - Score tracker { home: number, away: number }
+    //   - matchComplete: bool (required) - Whether match is finished
+    //   - matchWinner: string (optional, 'home' | 'away') - Winning team role
+    //   - arena: map (optional) - Arena lobby details { id, password, updatedAt }
+    //   - mutualStage: map (optional) - Mutual stage agreement & blind commitment state
+    //   - history: list (optional, <= 25 items) - Undo action history stack
+    //
+    // ===============================================================
+
+    // Helper: user has an entry in the allowlist
+    function isAuthorized() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    // Helper: get the requesting user's role string
+    function userRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    // Helper: is user at least a viewer (any authorized user)
+    function isViewer() {
+      return isAuthorized();
+    }
+
+    // Helper: is user at least a board_member
+    function isBoardMember() {
+      return isAuthorized() && userRole() in ['board_member', 'admin', 'super_admin'];
+    }
+
+    // Helper: is user at least an admin
+    function isAdmin() {
+      return isAuthorized() && userRole() in ['admin', 'super_admin'];
+    }
+
+    // Helper: is user a super_admin
+    function isSuperAdmin() {
+      return isAuthorized() && userRole() == 'super_admin';
+    }
+
+    // ===============================================================
+    // SSBU Room Validation Helpers
+    // ===============================================================
+
+    // Validate room ID path parameter length and type
+    function isValidRoomId(roomId) {
+      return roomId is string &&
+        roomId.size() > 0 &&
+        roomId.size() <= 64;
+    }
+
+    // Validate arena lobby info map
+    function isValidArena(arena) {
+      return arena is map &&
+        arena.keys().hasOnly(['id', 'password', 'updatedAt']) &&
+        (!('id' in arena) || (arena.id is string && arena.id.size() <= 64)) &&
+        (!('password' in arena) || (arena.password is string && arena.password.size() <= 64)) &&
+        (!('updatedAt' in arena) || arena.updatedAt is number);
+    }
+
+    // Validate mutual stage agreement state map
+    function isValidMutualStage(mutual) {
+      return mutual is map &&
+        mutual.keys().hasOnly([
+          'enabled', 'status', 'homeCommitment', 'awayCommitment',
+          'homeRevealed', 'awayRevealed', 'matchedStageId'
+        ]) &&
+        (!('enabled' in mutual) || mutual.enabled is bool) &&
+        (!('status' in mutual) || mutual.status in ['pending', 'agreed', 'mismatched', 'skipped']) &&
+        (!('homeCommitment' in mutual) || (mutual.homeCommitment is string && mutual.homeCommitment.size() <= 128)) &&
+        (!('awayCommitment' in mutual) || (mutual.awayCommitment is string && mutual.awayCommitment.size() <= 128)) &&
+        (!('matchedStageId' in mutual) || (mutual.matchedStageId is string && mutual.matchedStageId.size() <= 64)) &&
+        (!('homeRevealed' in mutual) || (
+          mutual.homeRevealed is map &&
+          mutual.homeRevealed.keys().hasOnly(['stageId', 'salt']) &&
+          mutual.homeRevealed.stageId is string && mutual.homeRevealed.stageId.size() <= 64 &&
+          mutual.homeRevealed.salt is string && mutual.homeRevealed.salt.size() <= 64
+        )) &&
+        (!('awayRevealed' in mutual) || (
+          mutual.awayRevealed is map &&
+          mutual.awayRevealed.keys().hasOnly(['stageId', 'salt']) &&
+          mutual.awayRevealed.stageId is string && mutual.awayRevealed.stageId.size() <= 64 &&
+          mutual.awayRevealed.salt is string && mutual.awayRevealed.salt.size() <= 64
+        ));
+    }
+
+    // Domain validator for ssbu_rooms document data
+    function isValidSSBURoom(data) {
+      let requiredFields = [
+        'roomId', 'createdAt', 'lastUpdated', 'mode',
+        'homeConnected', 'awayConnected', 'currentBattleIndex',
+        'battles', 'scores', 'matchComplete'
+      ];
+      let allowedFields = [
+        'roomId', 'createdAt', 'lastUpdated', 'mode',
+        'homeConnected', 'awayConnected', 'currentBattleIndex',
+        'battles', 'scores', 'matchComplete', 'matchWinner',
+        'arena', 'mutualStage', 'history'
+      ];
+
+      return data.keys().hasAll(requiredFields) &&
+        data.keys().hasOnly(allowedFields) &&
+        data.roomId is string &&
+        data.roomId.size() > 0 &&
+        data.roomId.size() <= 64 &&
+        data.createdAt is number &&
+        data.createdAt > 0 &&
+        data.lastUpdated is number &&
+        data.lastUpdated > 0 &&
+        data.mode in ['crews', 'solos'] &&
+        data.homeConnected is bool &&
+        data.awayConnected is bool &&
+        data.currentBattleIndex is number &&
+        data.currentBattleIndex >= 0 &&
+        data.currentBattleIndex <= 10 &&
+        data.battles is list &&
+        data.battles.size() <= 20 &&
+        data.scores is map &&
+        data.scores.keys().hasOnly(['home', 'away']) &&
+        data.scores.home is number &&
+        data.scores.home >= 0 &&
+        data.scores.home <= 10 &&
+        data.scores.away is number &&
+        data.scores.away >= 0 &&
+        data.scores.away <= 10 &&
+        data.matchComplete is bool &&
+        (!('matchWinner' in data) || data.matchWinner in ['home', 'away']) &&
+        (!('history' in data) || (data.history is list && data.history.size() <= 25)) &&
+        (!('arena' in data) || isValidArena(data.arena)) &&
+        (!('mutualStage' in data) || isValidMutualStage(data.mutualStage));
+    }
+
+    // Users collection — allowlist management
+    match /users/{userId} {
+      // Any authorized user can list members
+      allow read: if isViewer();
+      // Users can always read their own document (needed on first login before full auth resolves)
+      allow get: if request.auth != null && request.auth.uid == userId;
+      // Only super_admin can create/update/delete users
+      allow write: if isSuperAdmin();
+    }
+
+    // Rulesets Collection
+    match /rulesets/{document=**} {
+      allow read: if isViewer();
+      allow write: if isBoardMember();
+    }
+
+    // Stats Collection
+    match /leagueStats/{document=**} {
+      allow read: if isViewer();
+      allow write: if isAdmin();
+    }
+
+    // SSBU Real-time Match Rooms (ephemeral public match coordination)
+    match /ssbu_rooms/{roomId} {
+      allow read: if isValidRoomId(roomId);
+      allow create: if isValidRoomId(roomId) && isValidSSBURoom(request.resource.data);
+      allow update: if isValidRoomId(roomId) &&
+        isValidSSBURoom(request.resource.data) &&
+        request.resource.data.roomId == resource.data.roomId;
+      allow delete: if isValidRoomId(roomId);
+    }
+
+    // Default Deny for unknown collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "short_name": "SSBU Wizard",
+  "name": "MiHSEF SSBU Stage Wizard",
+  "description": "Michigan High School Esports Federation Super Smash Bros Ultimate Stage Ban & Match Coordinator",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0a0c10",
+  "theme_color": "#FF9933",
+  "display": "standalone",
+  "orientation": "portrait"
+}

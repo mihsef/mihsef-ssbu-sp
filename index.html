@@ -5,114 +5,20 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MIHSEF State Finals 2026 - Stage Select</title>
+  <meta name="theme-color" content="#0a0c10" />
+  <meta name="description" content="MiHSEF Official Super Smash Bros Ultimate Crews & Solos Stage Wizard" />
+  <link rel="manifest" href="/manifest.json" />
+  <title>MiHSEF SSBU Stage Wizard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Oxygen:wght@300;400;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Oxygen:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="./src/style.css">
-  <link rel="stylesheet" href="./src/rules.css">
 </head>
 
-<body>
-  <div id="app">
-    <header>
-      <div class="header-top">
-        <h1>MIHSEF STATE FINALS</h1>
-        <div class="toggle-container">
-          <span class="toggle-label" id="label-solos">SOLOS</span>
-          <label class="switch">
-            <input type="checkbox" id="event-toggle">
-            <span class="slider round"></span>
-          </label>
-          <span class="toggle-label" id="label-crews">CREWS</span>
-        </div>
-      </div>
-      <h2 id="subtitle">GAME 1 STAGE STRIKING</h2>
-
-      <!-- Progress Bar -->
-      <div class="progress-section">
-        <div class="progress-steps">
-          <div class="step" data-step="0" data-team="home">HOME BAN</div>
-          <div class="step" data-step="1" data-team="away">AWAY BAN</div>
-          <div class="step" data-step="2" data-team="away">AWAY BAN</div>
-          <div class="step" data-step="3" data-team="home">HOME PICK</div>
-        </div>
-        <div class="turn-container">
-          <div class="turn-indicator" id="turn-message">Home Team: Ban 1 Stage</div>
-          <button id="mini-reset" class="mini-reset-btn" aria-label="Reset" title="Reset Strikes">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-              <path d="M3 3v5h5" />
-            </svg>
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <main>
-      <!-- Pre-Match Quick Reference -->
-      <section class="flow-guide" id="flow-guide">
-        <div class="flow-card" id="game1-flow">
-          <div class="flow-title">📋 GAME 1 FLOW</div>
-          <ol class="flow-steps">
-            <li><span class="flow-team home">HOME</span> announces character(s)</li>
-            <li><span class="flow-team away">AWAY</span> announces character(s)</li>
-            <li>Complete stage striking below ↓</li>
-          </ol>
-        </div>
-        <div class="flow-card" id="subsequent-flow">
-          <div class="flow-title">⚔️ SUBSEQUENT GAMES</div>
-          <ol class="flow-steps" id="subsequent-steps">
-            <!-- Injected by JS based on mode -->
-          </ol>
-        </div>
-      </section>
-
-      <!-- Starter Stages -->
-      <section class="stage-section">
-        <h3>STARTER STAGES</h3>
-        <div class="stage-grid" id="starter-grid">
-          <!-- Stages injected by JS -->
-        </div>
-      </section>
-
-      <!-- Counterpick Stages -->
-      <section class="stage-section secondary">
-        <h3>COUNTERPICK STAGES</h3>
-
-        <div class="rules-box">
-          <h4>STAGE SELECTION (SUBSEQUENT GAMES)</h4>
-          <ul>
-            <li>Winner declares character(s) first, then Loser.</li>
-            <li>Winner strikes <strong>2 stages</strong> from complete list of 8 stages.</li>
-            <li>Loser chooses next stage.</li>
-            <li class="note">*Cannot pick a stage you have already won on (DSR).</li>
-          </ul>
-        </div>
-
-        <div class="stage-grid" id="counterpick-grid">
-          <!-- Stages injected by JS -->
-        </div>
-      </section>
-
-      <div class="controls">
-        <button id="reset-btn" class="btn reset-btn">RESET STRIKES</button>
-
-        <div class="external-links">
-          <a id="btn-bracket"
-            href="https://fan.fenworks.com/Michigan"
-            target="_blank" class="btn">VIEW BRACKET</a>
-          <a id="btn-rules"
-            href="/docs/game-manuals/ssbu-solos"
-            target="_blank" class="btn">VIEW RULESET</a>
-        </div>
-      </div>
-    </main>
-  </div>
-  <script type="module" src="./src/main.js"></script>
+<body class="bg-[#0a0c10] text-[#f3f4f6]">
+  <div id="root"></div>
+  <script type="module" src="./src/main.tsx"></script>
 </body>
 
 </html>

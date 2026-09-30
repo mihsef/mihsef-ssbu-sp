@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-orange: #FF9933;
+  --color-brand-orange-hover: #ffad55;
+  --color-brand-cyan: #05d9e8;
+  --color-brand-cyan-hover: #3be2ee;
+  --color-brand-dark: #0a0c10;
+  --color-brand-card: #14171f;
+  --color-brand-card-hover: #1b202a;
+  --color-brand-border: #262c3a;
+  --font-oxygen: 'Oxygen', sans-serif;
+  --font-outfit: 'Outfit', sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0a0c10;
+  color: #f3f4f6;
+  font-family: 'Oxygen', sans-serif;
+  min-height: 100vh;
+}
