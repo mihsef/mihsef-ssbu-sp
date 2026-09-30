@@ -116,6 +116,7 @@ export const BattleProgressionStep: React.FC<BattleProgressionStepProps> = ({
             winnerCharacter={currentBattle.winnerCharacter}
             loserCharacter={currentBattle.loserCharacter}
             subheading={`Battle ${currentBattle.battleNumber} active. Play until all stocks are depleted.`}
+            isMutualAgreement={currentBattle.battleNumber === 1 && room.mutualStage?.status === 'agreed'}
           />
 
           {/* Undo previous action if misclicked */}

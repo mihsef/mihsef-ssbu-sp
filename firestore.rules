@@ -82,10 +82,11 @@ service cloud.firestore {
       return mutual is map &&
         mutual.keys().hasOnly([
           'enabled', 'status', 'homeCommitment', 'awayCommitment',
-          'homeRevealed', 'awayRevealed', 'matchedStageId'
+          'homeRevealed', 'awayRevealed', 'matchedStageId', 'skippedBy'
         ]) &&
         (!('enabled' in mutual) || mutual.enabled is bool) &&
         (!('status' in mutual) || mutual.status in ['pending', 'agreed', 'mismatched', 'skipped']) &&
+        (!('skippedBy' in mutual) || mutual.skippedBy in ['home', 'away']) &&
         (!('homeCommitment' in mutual) || (mutual.homeCommitment is string && mutual.homeCommitment.size() <= 128)) &&
         (!('awayCommitment' in mutual) || (mutual.awayCommitment is string && mutual.awayCommitment.size() <= 128)) &&
         (!('matchedStageId' in mutual) || (mutual.matchedStageId is string && mutual.matchedStageId.size() <= 64)) &&

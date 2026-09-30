@@ -152,6 +152,40 @@ export async function submitMutualCommitment(
   });
 }
 
+export async function clearMutualCommitment(
+  roomId: string,
+  role: TeamRole
+): Promise<void> {
+  const roomRef = doc(db, COLLECTION_NAME, roomId.toUpperCase());
+  await runTransaction(db, async (txn) => {
+    const snap = await txn.get(roomRef);
+    if (!snap.exists()) return;
+    const data = snap.data() as MatchRoom;
+    const newHistory = createSnapshotHistory(data);
+
+    const currentMutual = data.mutualStage || { enabled: true, status: 'pending' };
+    const updatedMutual: Record<string, any> = {
+      ...currentMutual,
+      enabled: true,
+      status: 'pending' as const
+    };
+
+    if (role === 'home') {
+      delete updatedMutual.homeCommitment;
+      delete updatedMutual.homeRevealed;
+    } else {
+      delete updatedMutual.awayCommitment;
+      delete updatedMutual.awayRevealed;
+    }
+
+    txn.update(roomRef, {
+      mutualStage: updatedMutual,
+      history: newHistory,
+      lastUpdated: Date.now()
+    });
+  });
+}
+
 export async function revealMutualChoice(
   roomId: string,
   role: TeamRole,
@@ -211,7 +245,7 @@ export async function revealMutualChoice(
   });
 }
 
-export async function skipMutualStage(roomId: string): Promise<void> {
+export async function skipMutualStage(roomId: string, byRole?: TeamRole): Promise<void> {
   const roomRef = doc(db, COLLECTION_NAME, roomId.toUpperCase());
   await runTransaction(db, async (txn) => {
     const snap = await txn.get(roomRef);
@@ -221,6 +255,9 @@ export async function skipMutualStage(roomId: string): Promise<void> {
 
     const mutual = data.mutualStage || { enabled: false, status: 'skipped' };
     mutual.status = 'skipped';
+    if (byRole) {
+      mutual.skippedBy = byRole;
+    }
 
     txn.update(roomRef, {
       mutualStage: mutual,
@@ -241,6 +278,8 @@ export async function banOrPickStage(
     if (!snap.exists()) return;
     const data = snap.data() as MatchRoom;
 
+    const newHistory = createSnapshotHistory(data);
+
     const battle = data.battles[data.currentBattleIndex];
     if (!battle || battle.status !== 'striking') return;
 
@@ -250,7 +289,7 @@ export async function banOrPickStage(
     // If mutual stage was pending and someone starts banning, automatically skip friendly!
     let mutual = data.mutualStage;
     if (mutual && mutual.status === 'pending') {
-      mutual = { ...mutual, status: 'skipped' };
+      mutual = { ...mutual, status: 'skipped', skippedBy: byRole };
     }
 
     const isGame1 = battle.battleNumber === 1;

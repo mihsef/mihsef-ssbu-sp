@@ -21,6 +21,7 @@ export interface MutualStageState {
   awayRevealed?: { stageId: string; salt: string };
   status: 'pending' | 'agreed' | 'mismatched' | 'skipped';
   matchedStageId?: string;
+  skippedBy?: TeamRole;
 }
 
 export interface BanAction {

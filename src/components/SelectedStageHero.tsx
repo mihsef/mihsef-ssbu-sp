@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, ShieldAlert, Swords, Tv } from 'lucide-react';
+import { CheckCircle2, ShieldAlert, Swords, Tv, Sparkles, Handshake } from 'lucide-react';
 import { Stage, TeamRole, CharacterDeclaration } from '../types';
 
 interface SelectedStageHeroProps {
@@ -10,6 +10,7 @@ interface SelectedStageHeroProps {
   winnerCharacter?: CharacterDeclaration;
   loserCharacter?: CharacterDeclaration;
   subheading?: string;
+  isMutualAgreement?: boolean;
 }
 
 export const SelectedStageHero: React.FC<SelectedStageHeroProps> = ({
@@ -19,20 +20,38 @@ export const SelectedStageHero: React.FC<SelectedStageHeroProps> = ({
   winnerRole,
   winnerCharacter,
   loserCharacter,
-  subheading
+  subheading,
+  isMutualAgreement = false
 }) => {
   const loserRole = winnerRole ? (winnerRole === 'home' ? 'away' : 'home') : undefined;
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border-2 border-emerald-400 bg-[#0e131d] shadow-[0_0_35px_rgba(16,185,129,0.25)] transition-all">
+    <div className={`relative overflow-hidden rounded-2xl border-2 ${
+      isMutualAgreement
+        ? 'border-emerald-400 ring-2 ring-emerald-400/50 shadow-[0_0_45px_rgba(16,185,129,0.35)]'
+        : 'border-emerald-400 shadow-[0_0_35px_rgba(16,185,129,0.25)]'
+    } bg-[#0e131d] transition-all`}>
       {/* Top Banner Tag */}
-      <div className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 px-4 py-2 flex items-center justify-between shadow-sm">
+      <div className={`px-4 py-2 flex items-center justify-between shadow-sm ${
+        isMutualAgreement
+          ? 'bg-gradient-to-r from-amber-400 via-emerald-400 to-[#05d9e8]'
+          : 'bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500'
+      }`}>
         <div className="flex items-center gap-2 text-black font-black uppercase text-xs sm:text-sm tracking-wider font-outfit">
-          <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-black" />
-          <span>Battle {battleNumber} Stage Locked In</span>
+          {isMutualAgreement ? (
+            <>
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-black animate-spin" />
+              <span>⚡ Telepathic Mind Sync! Battle {battleNumber} Stage Unlocked ⚡</span>
+            </>
+          ) : (
+            <>
+              <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-black" />
+              <span>Battle {battleNumber} Stage Locked In</span>
+            </>
+          )}
         </div>
         <span className="bg-black/30 backdrop-blur-sm text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-          {mode === 'crews' ? 'Crews (9 Stocks)' : 'Solos 1v1'}
+          {isMutualAgreement ? 'Gentleman\'s Pick' : mode === 'crews' ? 'Crews (9 Stocks)' : 'Solos 1v1'}
         </span>
       </div>
 
@@ -47,9 +66,18 @@ export const SelectedStageHero: React.FC<SelectedStageHeroProps> = ({
 
         {/* Large Stage Name Overlay */}
         <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 text-center space-y-1">
-          <span className="text-[11px] sm:text-xs font-black tracking-widest text-emerald-300 uppercase block font-mono">
-            Official Selected Arena
-          </span>
+          {isMutualAgreement ? (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/50 backdrop-blur-md mb-1">
+              <Handshake className="w-3.5 h-3.5 text-emerald-300" />
+              <span className="text-[11px] font-extrabold text-emerald-300 uppercase tracking-widest font-outfit">
+                Both Teams Chose the Same Friendly Stage!
+              </span>
+            </div>
+          ) : (
+            <span className="text-[11px] sm:text-xs font-black tracking-widest text-emerald-300 uppercase block font-mono">
+              Official Selected Arena
+            </span>
+          )}
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white font-outfit uppercase tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
             {stage.name}
           </h2>

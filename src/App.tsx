@@ -20,6 +20,7 @@ export const App: React.FC = () => {
     saveArena,
     proposeMutualStage,
     optOutMutual,
+    cancelMutualStage,
     handleStageAction,
     handleCharacterDeclaration,
     handleBattleWin,
@@ -59,6 +60,8 @@ export const App: React.FC = () => {
       <div className="w-full max-w-3xl">
         <Header
           room={room}
+          myRole={myRole}
+          onSelectRole={selectRole}
           onReset={handleReset}
           onUndo={handleUndo}
           canUndo={canUndo}
@@ -147,6 +150,7 @@ export const App: React.FC = () => {
                 onStageAction={handleStageAction}
                 onProposeMutual={proposeMutualStage}
                 onOptOutMutual={optOutMutual}
+                onCancelMutual={cancelMutualStage}
                 onUndo={handleUndo}
                 canUndo={canUndo}
               />

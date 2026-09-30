@@ -6,6 +6,7 @@ import {
   claimTeamRole,
   updateArenaInfo,
   submitMutualCommitment,
+  clearMutualCommitment,
   revealMutualChoice,
   skipMutualStage,
   banOrPickStage,
@@ -159,11 +160,21 @@ export function useMatchRoom() {
   const optOutMutual = useCallback(async () => {
     if (!roomId) return;
     try {
-      await skipMutualStage(roomId);
+      await skipMutualStage(roomId, myRole || undefined);
     } catch (err) {
       console.error('Error opting out of mutual pick:', err);
     }
-  }, [roomId]);
+  }, [roomId, myRole]);
+
+  const cancelMutualStage = useCallback(async () => {
+    if (!roomId || !myRole) return;
+    try {
+      sessionStorage.removeItem(`ssbu_mutual_${roomId}_${myRole}`);
+      await clearMutualCommitment(roomId, myRole);
+    } catch (err) {
+      console.error('Error canceling mutual stage pick:', err);
+    }
+  }, [roomId, myRole]);
 
   const handleStageAction = useCallback(
     async (stageId: string) => {
@@ -230,6 +241,7 @@ export function useMatchRoom() {
     saveArena,
     proposeMutualStage,
     optOutMutual,
+    cancelMutualStage,
     handleStageAction,
     handleCharacterDeclaration,
     handleBattleWin,
