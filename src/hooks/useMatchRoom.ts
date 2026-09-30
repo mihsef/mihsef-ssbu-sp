@@ -10,6 +10,7 @@ import {
   skipMutualStage,
   banOrPickStage,
   recordBattleWinner,
+  declareBattleCharacter,
   undoLastAction,
   resetRoomToInitial
 } from '../lib/firestore';
@@ -188,6 +189,18 @@ export function useMatchRoom() {
     [roomId]
   );
 
+  const handleCharacterDeclaration = useCallback(
+    async (isWinner: boolean, switching: boolean, characterName?: string) => {
+      if (!roomId) return;
+      try {
+        await declareBattleCharacter(roomId, isWinner, switching, characterName);
+      } catch (err: any) {
+        console.error('Error declaring character:', err);
+      }
+    },
+    [roomId]
+  );
+
   const handleUndo = useCallback(async () => {
     if (!roomId) return;
     try {
@@ -218,6 +231,7 @@ export function useMatchRoom() {
     proposeMutualStage,
     optOutMutual,
     handleStageAction,
+    handleCharacterDeclaration,
     handleBattleWin,
     handleUndo,
     handleReset

@@ -3,7 +3,6 @@ import { Header } from './components/Header';
 import { StepCard } from './components/StepCard';
 import { RoomJoinStep } from './components/RoomJoinStep';
 import { TeamLobbyStep } from './components/TeamLobbyStep';
-import { MutualStageStep } from './components/MutualStageStep';
 import { Game1StrikingStep } from './components/Game1StrikingStep';
 import { BattleProgressionStep } from './components/BattleProgressionStep';
 import { useMatchRoom } from './hooks/useMatchRoom';
@@ -22,6 +21,7 @@ export const App: React.FC = () => {
     proposeMutualStage,
     optOutMutual,
     handleStageAction,
+    handleCharacterDeclaration,
     handleBattleWin,
     handleUndo,
     handleReset
@@ -32,34 +32,27 @@ export const App: React.FC = () => {
   const hasRole = !!myRole;
   const hasArena = !!room?.arena?.id;
 
-  const mutualStatus = room?.mutualStage?.status;
-  const isMutualAgreed = mutualStatus === 'agreed';
-  const isMutualResolved = isMutualAgreed || mutualStatus === 'mismatched' || mutualStatus === 'skipped';
-
   const battle1 = room?.battles[0];
   const isBattle1Selected = (battle1?.status === 'in_progress' || battle1?.status === 'complete') && !!battle1?.selectedStageId;
-  const isBattle1Complete = battle1?.status === 'complete';
 
   const pool = room?.mode === 'solos' ? SOLOS_STARTERS : CREWS_POOL;
   const battle1StageObj = pool.find((s) => s.id === battle1?.selectedStageId);
 
-  // Active step computation
+  // Active step computation:
   // Step 1: Room Join & Share
   // Step 2: Role & Arena
-  // Step 3: Mutual Friendly Stage
-  // Step 4: Battle 1 Striking
-  // Step 5: Subsequent Battles & Result
+  // Step 3: Game 1 Stage Striking (Friendly nomination embedded)
+  // Step 4: Subsequent Battles, Character Declarations & Results
   const activeStepNumber = !hasRoom
     ? 1
     : !hasRole || (myRole === 'home' && !hasArena)
     ? 2
-    : !isMutualResolved
-    ? 3
     : !isBattle1Selected
-    ? 4
-    : 5;
+    ? 3
+    : 4;
 
   const canUndo = (room?.history?.length || 0) > 0;
+  const seriesFormatText = room?.mode === 'crews' ? 'Best of 3' : 'Best of 5';
 
   return (
     <div className="min-h-screen bg-[#0a0c10] text-[#f3f4f6] flex justify-center py-6 px-3 sm:px-6">
@@ -86,7 +79,7 @@ export const App: React.FC = () => {
           summary={
             room ? (
               <span className="font-mono text-[#FF9933]">
-                Room: {room.roomId} • Format: {room.mode.toUpperCase()} (Best of 3)
+                Room: {room.roomId} • Format: {room.mode.toUpperCase()} ({seriesFormatText})
               </span>
             ) : null
           }
@@ -132,47 +125,17 @@ export const App: React.FC = () => {
           )}
         </StepCard>
 
-        {/* Phase 3: Mutual Friendly Stage Agreement */}
+        {/* Phase 3: Game 1 Stage Selection & Striking (Friendly Embedded + Striking Grid) */}
         {hasRole && (
           <StepCard
             stepNumber="3"
-            title="Mutual Friendly Stage Agreement (Optional)"
-            isCompleted={isMutualResolved}
-            isActive={activeStepNumber === 3}
-            summary={
-              isMutualAgreed ? (
-                <span className="text-emerald-400 font-semibold">
-                  ✓ Mutually agreed on {pool.find((s) => s.id === room?.mutualStage?.matchedStageId)?.name || 'Stage'}
-                </span>
-              ) : isMutualResolved ? (
-                <span className="text-gray-400">
-                  Skipped / Mismatched → Proceeded to official bans
-                </span>
-              ) : null
-            }
-          >
-            {room && myRole && (
-              <MutualStageStep
-                room={room}
-                myRole={myRole}
-                onPropose={proposeMutualStage}
-                onOptOut={optOutMutual}
-              />
-            )}
-          </StepCard>
-        )}
-
-        {/* Phase 4: Battle 1 Stage Striking & 9-Stock Callout */}
-        {hasRole && isMutualResolved && (
-          <StepCard
-            stepNumber="4"
-            title="Battle 1 Stage Striking & Permanence Rule"
+            title="Game 1 Stage Selection"
             isCompleted={isBattle1Selected}
-            isActive={activeStepNumber === 4}
+            isActive={activeStepNumber === 3}
             summary={
               battle1StageObj ? (
                 <span className="text-emerald-400 font-semibold">
-                  ✓ Battle 1 Stage: {battle1StageObj.name} (Stays until 9 stocks lost)
+                  ✓ Selected Stage: {battle1StageObj.name} {room.mode === 'crews' ? '(9-Stock Permanence)' : ''}
                 </span>
               ) : null
             }
@@ -182,18 +145,22 @@ export const App: React.FC = () => {
                 room={room}
                 myRole={myRole}
                 onStageAction={handleStageAction}
+                onProposeMutual={proposeMutualStage}
+                onOptOutMutual={optOutMutual}
+                onUndo={handleUndo}
+                canUndo={canUndo}
               />
             )}
           </StepCard>
         )}
 
-        {/* Phase 5 & 6: Subsequent Battles, Counterpicks & Match Resolution */}
+        {/* Phase 4: Subsequent Battles, Character Declarations, Counterpicks & Match Resolution */}
         {hasRole && isBattle1Selected && (
           <StepCard
-            stepNumber="5"
-            title="Battle Results, DSR Counterpicks & Match Resolution"
+            stepNumber="4"
+            title="Battle Progression, Character Declarations & DSR Counterpicks"
             isCompleted={room?.matchComplete || false}
-            isActive={activeStepNumber === 5}
+            isActive={activeStepNumber === 4}
             summary={
               room?.matchComplete ? (
                 <span className="text-[#FF9933] font-bold">
@@ -212,6 +179,9 @@ export const App: React.FC = () => {
                 myRole={myRole}
                 onRecordWinner={handleBattleWin}
                 onStageAction={handleStageAction}
+                onDeclareCharacter={handleCharacterDeclaration}
+                onUndo={handleUndo}
+                canUndo={canUndo}
               />
             )}
           </StepCard>
@@ -222,7 +192,7 @@ export const App: React.FC = () => {
             Official Michigan High School Esports Federation (MiHSEF) SSBU Match Coordinator
           </p>
           <p className="text-[11px] text-gray-600">
-            Stages and strike sequences align with the official Fall 2026 SSBU Ruleset.
+            Stages, character declarations, and strike sequences align with the official Fall 2026 SSBU Ruleset.
           </p>
         </footer>
       </div>

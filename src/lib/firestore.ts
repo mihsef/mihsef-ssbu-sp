@@ -7,7 +7,7 @@ import {
   runTransaction
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { MatchRoom, TeamRole, BattleState } from '../types';
+import { MatchRoom, TeamRole, BattleState, CharacterDeclaration } from '../types';
 import { CREWS_POOL, CREWS_GAME1_STEPS, SOLOS_GAME1_STEPS, SOLOS_STARTERS } from '../data/stages';
 import { verifyStageChoice } from './crypto';
 
@@ -243,8 +243,11 @@ export async function banOrPickStage(
     // Verify stage not already banned
     if (battle.bannedStages.some((b) => b.stageId === stageId)) return;
 
-    // Take deep-cloned snapshot of state before modifying battle
-    const newHistory = createSnapshotHistory(data);
+    // If mutual stage was pending and someone starts banning, automatically skip friendly!
+    let mutual = data.mutualStage;
+    if (mutual && mutual.status === 'pending') {
+      mutual = { ...mutual, status: 'skipped' };
+    }
 
     const isGame1 = battle.battleNumber === 1;
 
@@ -317,11 +320,15 @@ export async function banOrPickStage(
       }
     }
 
-    txn.update(roomRef, {
+    const updatePayload: Record<string, any> = {
       battles: data.battles,
       history: newHistory,
       lastUpdated: Date.now()
-    });
+    };
+    if (mutual) {
+      updatePayload.mutualStage = mutual;
+    }
+    txn.update(roomRef, updatePayload);
   });
 }
 
@@ -350,13 +357,15 @@ export async function recordBattleWinner(
       away: data.scores.away + (winnerRole === 'away' ? 1 : 0)
     };
 
-    // Check if Best-of-3 is won (2 wins)
-    const isFinished = newScores.home >= 2 || newScores.away >= 2;
+    // Series length: Crews is Best-of-3 (2 wins), Solos is Best-of-5 (3 wins)
+    const targetWins = data.mode === 'crews' ? 2 : 3;
+    const isFinished = newScores.home >= targetWins || newScores.away >= targetWins;
 
     if (isFinished) {
       data.matchComplete = true;
-      data.matchWinner = newScores.home >= 2 ? 'home' : 'away';
+      data.matchWinner = newScores.home >= targetWins ? 'home' : 'away';
     } else {
+      const nextBattleNumber = data.battles.length + 1;
       // The loser of this completed battle will be the team picking in the next battle
       const nextBattleLoser = winnerRole === 'home' ? 'away' : 'home';
 
@@ -425,4 +434,43 @@ export async function resetRoomToInitial(roomId: string, mode: 'crews' | 'solos'
   const roomRef = doc(db, COLLECTION_NAME, roomId.toUpperCase());
   const initial = getInitialRoom(roomId, mode);
   await setDoc(roomRef, initial);
+}
+
+export async function declareBattleCharacter(
+  roomId: string,
+  isWinner: boolean,
+  switching: boolean,
+  characterName?: string
+): Promise<void> {
+  const roomRef = doc(db, COLLECTION_NAME, roomId.toUpperCase());
+  await runTransaction(db, async (txn) => {
+    const snap = await txn.get(roomRef);
+    if (!snap.exists()) return;
+    const data = snap.data() as MatchRoom;
+
+    const currentBattle = data.battles[data.currentBattleIndex];
+    if (!currentBattle) return;
+
+    const newHistory = createSnapshotHistory(data);
+
+    const declaration: CharacterDeclaration = {
+      switching,
+      declaredAt: Date.now()
+    };
+    if (switching && characterName && characterName.trim()) {
+      declaration.characterName = characterName.trim();
+    }
+
+    if (isWinner) {
+      currentBattle.winnerCharacter = declaration;
+    } else {
+      currentBattle.loserCharacter = declaration;
+    }
+
+    txn.update(roomRef, {
+      battles: data.battles,
+      history: newHistory,
+      lastUpdated: Date.now()
+    });
+  });
 }

@@ -29,6 +29,12 @@ export interface BanAction {
   stepIndex: number;
 }
 
+export interface CharacterDeclaration {
+  switching: boolean;
+  characterName?: string;
+  declaredAt?: number;
+}
+
 export interface BattleState {
   battleNumber: number; // 1, 2, 3
   status: 'striking' | 'in_progress' | 'complete';
@@ -36,6 +42,8 @@ export interface BattleState {
   winner?: TeamRole;
   bannedStages: BanAction[];
   stepIndex: number; // Index in striking sequence
+  winnerCharacter?: CharacterDeclaration;
+  loserCharacter?: CharacterDeclaration;
 }
 
 export interface MatchRoom {
