@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Edit3, X } from 'lucide-react';
 import { Header } from './components/Header';
 import { StepCard } from './components/StepCard';
 import { RoomJoinStep } from './components/RoomJoinStep';
@@ -28,25 +29,44 @@ export const App: React.FC = () => {
     handleReset
   } = useMatchRoom();
 
+  const [step2Confirmed, setStep2Confirmed] = useState<boolean>(false);
+  const [step2Editing, setStep2Editing] = useState<boolean>(false);
+
+  // Restore step 2 confirmed state from session storage for active room
+  useEffect(() => {
+    if (!roomId) return;
+    const stored = sessionStorage.getItem(`ssbu_step2_confirmed_${roomId}`);
+    if (stored === 'true') {
+      setStep2Confirmed(true);
+    } else {
+      setStep2Confirmed(false);
+    }
+    setStep2Editing(false);
+  }, [roomId]);
+
   // Determine stage & step completion status
   const hasRoom = !!room;
   const hasRole = !!myRole;
   const hasArena = !!room?.arena?.id;
 
   const battle1 = room?.battles[0];
+  const hasGame1Started = (battle1?.bannedStages?.length || 0) > 0 || !!battle1?.selectedStageId;
   const isBattle1Selected = (battle1?.status === 'in_progress' || battle1?.status === 'complete') && !!battle1?.selectedStageId;
+
+  // Step 2 is only completed once a role is selected AND confirmed (or strikes already began)
+  const isStep2Completed = hasRole && (step2Confirmed || hasGame1Started);
 
   const pool = room?.mode === 'solos' ? SOLOS_STARTERS : CREWS_POOL;
   const battle1StageObj = pool.find((s) => s.id === battle1?.selectedStageId);
 
   // Active step computation:
   // Step 1: Room Join & Share
-  // Step 2: Role & Arena (Arena optional)
+  // Step 2: Role & Arena (Arena optional - requires continue click)
   // Step 3: Game 1 Stage Striking (Friendly nomination embedded)
   // Step 4: Subsequent Battles, Character Declarations & Results
   const activeStepNumber = !hasRoom
     ? 1
-    : !hasRole
+    : !isStep2Completed
     ? 2
     : !isBattle1Selected
     ? 3
@@ -54,6 +74,13 @@ export const App: React.FC = () => {
 
   const canUndo = (room?.history?.length || 0) > 0;
   const seriesFormatText = room?.mode === 'crews' ? 'Best of 3' : 'Best of 5';
+
+  const handleConfirmLobby = () => {
+    setStep2Confirmed(true);
+    if (roomId) {
+      sessionStorage.setItem(`ssbu_step2_confirmed_${roomId}`, 'true');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0c10] text-[#f3f4f6] flex justify-center py-6 px-3 sm:px-6">
@@ -96,8 +123,31 @@ export const App: React.FC = () => {
         <StepCard
           stepNumber="2"
           title="Team Role & Arena Lobby (Optional)"
-          isCompleted={hasRole}
+          isCompleted={isStep2Completed}
           isActive={activeStepNumber === 2}
+          isExpanded={step2Editing}
+          action={
+            isStep2Completed ? (
+              <button
+                type="button"
+                onClick={() => setStep2Editing(!step2Editing)}
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-[#1b202a] hover:bg-[#262c3a] text-gray-300 hover:text-white border border-[#262c3a] hover:border-gray-500 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-95"
+                title="Switch teams or update Switch Arena lobby details"
+              >
+                {step2Editing ? (
+                  <>
+                    <X className="w-3.5 h-3.5 text-gray-400" />
+                    <span>Close Edit</span>
+                  </>
+                ) : (
+                  <>
+                    <Edit3 className="w-3.5 h-3.5 text-[#FF9933]" />
+                    <span>Change Team / Arena</span>
+                  </>
+                )}
+              </button>
+            ) : null
+          }
           summary={
             hasRole ? (
               <div className="flex flex-wrap items-center gap-2">
@@ -122,6 +172,9 @@ export const App: React.FC = () => {
               myRole={myRole}
               onSelectRole={selectRole}
               onSaveArena={saveArena}
+              onConfirmLobby={handleConfirmLobby}
+              isEditing={step2Editing}
+              onDoneEditing={() => setStep2Editing(false)}
             />
           )}
         </StepCard>
@@ -151,6 +204,7 @@ export const App: React.FC = () => {
                 onCancelMutual={cancelMutualStage}
                 onUndo={handleUndo}
                 canUndo={canUndo}
+                onSwitchRole={selectRole}
               />
             )}
           </StepCard>
@@ -184,6 +238,7 @@ export const App: React.FC = () => {
                 onDeclareCharacter={handleCharacterDeclaration}
                 onUndo={handleUndo}
                 canUndo={canUndo}
+                onSwitchRole={selectRole}
               />
             )}
           </StepCard>

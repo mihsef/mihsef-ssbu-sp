@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RotateCcw, Undo2, ExternalLink, Hash, Copy, Check, Share2, Plus, Swords } from 'lucide-react';
+import { RotateCcw, Undo2, ExternalLink, Hash, Copy, Check, Share2, Plus, Swords, Radio } from 'lucide-react';
 import { MatchRoom, TeamRole } from '../types';
 import { CREWS_POOL } from '../data/stages';
 
@@ -17,6 +17,18 @@ export const Header: React.FC<HeaderProps> = ({
   canUndo
 }) => {
   const [copied, setCopied] = useState(false);
+  const [copiedArena, setCopiedArena] = useState(false);
+
+  const handleCopyArena = async () => {
+    if (!room?.arena?.id) return;
+    try {
+      await navigator.clipboard.writeText(room.arena.id);
+      setCopiedArena(true);
+      setTimeout(() => setCopiedArena(false), 2000);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const roomUrl = room ? `${window.location.origin}${window.location.pathname}?room=${room.roomId}` : '';
 
@@ -223,6 +235,45 @@ export const Header: React.FC<HeaderProps> = ({
                     );
                   })}
               </div>
+            </div>
+          )}
+
+          {/* Switch Battle Arena HUD Banner (Visible across all match stages once broadcasted) */}
+          {room.arena?.id && (
+            <div className="pt-2.5 border-t border-[#262c3a] flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 font-mono flex items-center gap-1.5 shrink-0">
+                  <Radio className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Switch Arena:</span>
+                </span>
+                <span className="font-mono font-extrabold text-white tracking-wider bg-[#0a0c10] px-2.5 py-0.5 rounded-md border border-[#262c3a] text-sm">
+                  {room.arena.id}
+                </span>
+                {room.arena.password && (
+                  <span className="text-gray-300 text-xs font-mono">
+                    Pass: <strong className="text-white font-mono bg-[#0a0c10] px-1.5 py-0.5 rounded border border-[#262c3a]">{room.arena.password}</strong>
+                  </span>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={handleCopyArena}
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-[#05d9e8]/15 hover:bg-[#05d9e8]/25 text-[#05d9e8] border border-[#05d9e8]/30 rounded-lg text-xs font-bold transition-all active:scale-95 cursor-pointer"
+                title="Copy Switch Arena ID"
+              >
+                {copiedArena ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-[#05d9e8]" />
+                    <span>Arena ID Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5 text-[#05d9e8]" />
+                    <span>Copy Arena ID</span>
+                  </>
+                )}
+              </button>
             </div>
           )}
         </div>

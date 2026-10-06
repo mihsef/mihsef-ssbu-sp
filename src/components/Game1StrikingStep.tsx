@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertTriangle, Check, Ban, Swords, EyeOff, Sparkles, ChevronDown, ChevronUp, Undo2, Handshake, Zap, X } from 'lucide-react';
+import { AlertTriangle, Check, Ban, Swords, EyeOff, Sparkles, ChevronDown, ChevronUp, Undo2, Handshake, Zap, X, ArrowLeftRight } from 'lucide-react';
 import { MatchRoom, TeamRole, Stage } from '../types';
 import { CREWS_POOL, SOLOS_STARTERS, CREWS_GAME1_STEPS, SOLOS_GAME1_STEPS } from '../data/stages';
 import { SelectedStageHero } from './SelectedStageHero';
@@ -13,6 +13,7 @@ interface Game1StrikingStepProps {
   onCancelMutual?: () => void;
   onUndo?: () => void;
   canUndo?: boolean;
+  onSwitchRole?: (role: TeamRole) => void;
 }
 
 export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
@@ -23,7 +24,8 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
   onOptOutMutual,
   onCancelMutual,
   onUndo,
-  canUndo = false
+  canUndo = false,
+  onSwitchRole
 }) => {
   const battle = room.battles[0];
   const pool = room.mode === 'crews' ? CREWS_POOL : SOLOS_STARTERS;
@@ -358,6 +360,34 @@ export const Game1StrikingStep: React.FC<Game1StrikingStepProps> = ({
                 </p>
               </div>
             </div>
+          </div>
+
+          {/* Active Perspective & Quick Role Switcher */}
+          <div className="flex flex-wrap items-center justify-between gap-2 p-2 px-3 rounded-xl bg-[#0e1218] border border-[#262c3a] text-xs">
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wide">
+                You are:
+              </span>
+              <span className={`px-2.5 py-0.5 rounded-md text-[11px] font-black uppercase font-mono tracking-wider ${
+                myRole === 'home'
+                  ? 'bg-[#FF9933]/20 text-[#FF9933] border border-[#FF9933]/40'
+                  : 'bg-[#05d9e8]/20 text-[#05d9e8] border border-[#05d9e8]/40'
+              }`}>
+                {myRole.toUpperCase()} TEAM
+              </span>
+            </div>
+
+            {onSwitchRole && (
+              <button
+                type="button"
+                onClick={() => onSwitchRole(myRole === 'home' ? 'away' : 'home')}
+                className="flex items-center gap-1.5 text-xs font-semibold text-gray-300 hover:text-white transition-colors cursor-pointer group"
+                title={`Switch your local perspective to ${myRole === 'home' ? 'Away' : 'Home'} team`}
+              >
+                <ArrowLeftRight className="w-3.5 h-3.5 text-cyan-400 group-hover:rotate-180 transition-transform" />
+                <span>Wrong team? Switch to <strong className="text-white underline">{myRole === 'home' ? 'Away' : 'Home'}</strong></span>
+              </button>
+            )}
           </div>
 
           {/* 4. Striking Turn Sequence Header (shown in Ban mode) */}
