@@ -9,7 +9,7 @@ The official, open-source stage selection and match progression companion tool f
 
 Designed specifically to eliminate game day confusion for coaches and student players across both **3v3 Crews (9-Stock)** and **1v1 Solos** formats.
 
-* **Live Web App:** [https://mihsef-ssbu.web.app](https://mihsef-ssbu.web.app) *(or `https://ssbu.mihsef.org` upon DNS propagation)*
+* **Live Web App:** [https://ssbu.mihsef.org](https://ssbu.mihsef.org) *(mirror: `https://mihsef-ssbu.web.app`)*
 * **Official Ruleset:** [MiHSEF SSBU Crews Game Manual](https://mihsef.org/docs/game-manuals/ssbu-crews)
 
 ---
@@ -109,7 +109,7 @@ This application is completely decoupled and can be embedded directly into any t
 ### Direct iframe Embed
 ```html
 <iframe
-  src="https://mihsef-ssbu.web.app"
+  src="https://ssbu.mihsef.org"
   title="MiHSEF SSBU Stage Wizard"
   width="100%"
   height="900px"
@@ -121,7 +121,7 @@ This application is completely decoupled and can be embedded directly into any t
 ### Pre-filling / Direct Match Linking
 To link both coaches directly into an existing room:
 ```
-https://mihsef-ssbu.web.app/?room=ROOMID
+https://ssbu.mihsef.org/?room=ROOMID
 ```
 
 ---
